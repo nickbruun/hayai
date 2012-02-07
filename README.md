@@ -4,7 +4,7 @@ _hayai_ is a C++ framework for writing benchmarks for pieces of code along the l
 
 ## Building hayai
 
-_hayai_ is fully header based, but to use the simple `main` function as described in the introducty blog post, the source code must be compiled to provide `libhayai`. Compiling the source code requires `CMake` to be present on the system:
+_hayai_ is fully header based, but to use the simple `main` function as described in the introducty blog post, the source code must be compiled to provide `libhayai_main`. Compiling the source code requires `CMake` to be present on the system:
 
     $ cd hayai
     $ cmake .
