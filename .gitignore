@@ -1,0 +1,11 @@
+# Ignore temporary files from OS' and editors
+*~
+.DS_Store
+
+# Ignore build output
+CMakeCache.txt
+CMakeFiles
+Makefile
+cmake_install.cmake
+*.a
+sample/sample
