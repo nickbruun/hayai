@@ -2,6 +2,8 @@
 #include <iostream>
 #include <limits>
 #include <iomanip>
+#include <string>
+#include <fstream>
 
 #include "hayai-console.hpp"
 #include "hayai-testfactory.hpp"
@@ -54,10 +56,12 @@ namespace Hayai
             
             
         /// Run all benchmarking tests.
-        static void RunAllTests()
+        static void RunAllTests(std::string reportDir = "")
         {
             Benchmarker& instance = Instance();
             
+            bool reportToFile = (reportDir != "");
+
             // Initial output
             std::cout << std::fixed;
             std::cout << Console::TextGreen << "[==========]"
@@ -130,6 +134,13 @@ namespace Hayai
                               " iterations per run)")
                           << std::endl;
                 
+                std::ofstream report;
+                if(reportToFile) {
+					report.open((reportDir + "/" + descriptor->FixtureName + "-" + descriptor->TestName + ".dat").c_str(),
+							std::ios_base::app | std::ios_base::out);
+					report << "# Runs: " << descriptor->Runs << ", Iterations: " << descriptor->Iterations << std::endl;
+                }
+
                 // Execute each individual run.
                 int64_t timeTotal = 0,
                         timeRunMin = std::numeric_limits<int64_t>::max(),
@@ -225,6 +236,14 @@ namespace Hayai
                               iterationsPerSecondMin,
                               iterationsPerSecondAverage,
                               "iterations/s");
+
+                if(reportToFile) {
+					report << timeRunAverage << ' '
+							<< runsPerSecondAverage << ' ' << runsPerSecondMax << ' ' << runsPerSecondMin << ' '
+							<< timeIterationAverage << ' ' << timeIterationMax << ' ' << timeIterationMin << ' '
+							<< iterationsPerSecondAverage << ' ' << iterationsPerSecondMax << ' ' << iterationsPerSecondMin << std::endl;
+					report.close();
+                }
             }
 
 #undef PAD
@@ -238,6 +257,7 @@ namespace Hayai
                           " benchmarks.")
                       << std::endl;
         }
+
     private:
         /// Private constructor.
         Benchmarker()
@@ -255,7 +275,7 @@ namespace Hayai
                 delete this->_tests[index];
         }
             
-            
+
         std::vector<TestDescriptor*> _tests; ///< Registered tests.
     };
 }
