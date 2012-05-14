@@ -53,6 +53,10 @@ namespace Hayai
 
             return descriptor;
         }
+
+        static void AddIncludeFilter(std::string pattern) {
+        	Instance()._include.push_back(pattern);
+        }
             
             
         /// Run all benchmarking tests.
@@ -118,6 +122,23 @@ namespace Hayai
             {
                 // Get the test descriptor.
                 TestDescriptor* descriptor = instance._tests[index++];
+
+                // Check if test matches include filters
+                if(instance._include.size() > 0) {
+                	bool included = false;
+                	std::string name = descriptor->FixtureName + "." + descriptor->TestName;
+
+                	for(std::size_t i = 0; i <instance._include.size(); i++) {
+                		if(name.find(instance._include[i]) != std::string::npos) {
+                			included = true;
+                			break;
+                		}
+                	}
+
+                	if(!included) {
+                		continue;
+                	}
+                }
 
                 // Get test instance, which will handle BeforeTest() and AfterTest() hooks.
                 Test* hooks = descriptor->Factory->CreateTest();
@@ -272,6 +293,7 @@ namespace Hayai
             
 
         std::vector<TestDescriptor*> _tests; ///< Registered tests.
+        std::vector<std::string> _include; /// Test filters.
     };
 }
 #endif
