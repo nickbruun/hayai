@@ -56,12 +56,10 @@ namespace Hayai
             
             
         /// Run all benchmarking tests.
-        static void RunAllTests(std::string reportDir = "")
+        static void RunAllTests()
         {
             Benchmarker& instance = Instance();
             
-            bool reportToFile = (reportDir != "");
-
             // Initial output
             std::cout << std::fixed;
             std::cout << Console::TextGreen << "[==========]"
@@ -120,6 +118,10 @@ namespace Hayai
             {
                 // Get the test descriptor.
                 TestDescriptor* descriptor = instance._tests[index++];
+
+                // Get test instance, which will handle BeforeTest() and AfterTest() hooks.
+                Test* hooks = descriptor->Factory->CreateTest();
+                hooks->BeforeTest(descriptor->FixtureName, descriptor->TestName, descriptor->Runs, descriptor->Iterations);
                
                 // Describe the beginning of the run.
                 std::cout << Console::TextGreen << "[ RUN      ]"
@@ -134,13 +136,6 @@ namespace Hayai
                               " iterations per run)")
                           << std::endl;
                 
-                std::ofstream report;
-                if(reportToFile) {
-					report.open((reportDir + "/" + descriptor->FixtureName + "-" + descriptor->TestName + ".dat").c_str(),
-							std::ios_base::app | std::ios_base::out);
-					report << "# Runs: " << descriptor->Runs << ", Iterations: " << descriptor->Iterations << std::endl;
-                }
-
                 // Execute each individual run.
                 int64_t timeTotal = 0,
                         timeRunMin = std::numeric_limits<int64_t>::max(),
@@ -237,13 +232,13 @@ namespace Hayai
                               iterationsPerSecondAverage,
                               "iterations/s");
 
-                if(reportToFile) {
-					report << timeRunAverage << ' '
-							<< runsPerSecondAverage << ' ' << runsPerSecondMax << ' ' << runsPerSecondMin << ' '
-							<< timeIterationAverage << ' ' << timeIterationMax << ' ' << timeIterationMin << ' '
-							<< iterationsPerSecondAverage << ' ' << iterationsPerSecondMax << ' ' << iterationsPerSecondMin << std::endl;
-					report.close();
-                }
+                hooks->AfterRun(
+                		timeRunAverage,
+						runsPerSecondAverage, runsPerSecondMax, runsPerSecondMin,
+						timeIterationAverage, timeIterationMax, timeIterationMin,
+						iterationsPerSecondAverage, iterationsPerSecondMax, iterationsPerSecondMin
+                		);
+                delete hooks;
             }
 
 #undef PAD
