@@ -68,7 +68,7 @@ protected:                                                                      
 void BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::TestPayload arguments
 
 #define BENCHMARK_P(fixture_name, benchmark_name, runs, iterations, arguments)                          \
-  BENCHMARK_P_(fixture_name, benchmark_name, Hayai::Fixture, arguments)
+  BENCHMARK_P_(fixture_name, benchmark_name, Hayai::Fixture, runs, iterations, arguments)
 
 #define BENCHMARK_P_F(fixture_name, benchmark_name, runs, iterations, arguments)                        \
   BENCHMARK_P_(fixture_name, benchmark_name, fixture_name, runs, iterations, arguments)
@@ -80,7 +80,7 @@ void BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::TestPayload arguments
 class BENCHMARK_P_CLASS_NAME_(fixture_name, benchmark_name, id):                                        \
   public BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name) {                                          \
 protected:                                                                                              \
-  virtual void TestBody() { this->TestPayload (arguments); }                                            \
+  virtual void TestBody() { this->TestPayload arguments; }                                            \
 private:                                                                                                \
   static const ::Hayai::TestDescriptor* _descriptor;                                                    \
 };                                                                                                      \
