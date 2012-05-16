@@ -146,9 +146,10 @@ namespace Hayai
                
                 // Describe the beginning of the run.
                 std::cout << Console::TextGreen << "[ RUN      ]"
-                          << Console::TextDefault << " "
+                          << Console::TextYellow << " "
                           << descriptor->FixtureName << "."
                           << descriptor->TestName
+                          << Console::TextDefault
                           << " (" << descriptor->Runs
                           << (descriptor->Runs == 1 ? " run, " : " runs, ") 
                           << descriptor->Iterations
@@ -199,13 +200,14 @@ namespace Hayai
 
                 // Describe the end of the run.
                 std::cout << Console::TextGreen << "[     DONE ]"
-                          << Console::TextDefault << " "
+                          << Console::TextYellow << " "
                           << descriptor->FixtureName << "."
-                          << descriptor->TestName << " ("
+                          << descriptor->TestName
+                          << Console::TextDefault << " ("
                           << (double(timeTotal) / 1000.0) << " ms)"
                           << std::endl;
                 
-                std::cout << Console::TextYellow << "[   RUNS   ] "
+                std::cout << Console::TextBlue << "[   RUNS   ] "
                           << Console::TextDefault
                           << "       Average time: " << timeRunAverage
                           << " us" << std::endl;
@@ -229,7 +231,7 @@ namespace Hayai
                               runsPerSecondAverage,
                               "runs/s");
 
-                std::cout << Console::TextYellow << "[ITERATIONS] "
+                std::cout << Console::TextBlue << "[ITERATIONS] "
                           << Console::TextDefault
                           << "       Average time: " << timeIterationAverage
                           << " us" << std::endl;
