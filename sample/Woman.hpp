@@ -54,6 +54,10 @@ public:
         while (moneyInTheBank > 0)
             moneyInTheBank -= this->_score;
     }
+
+    int getScore() {
+    	return this->_score;
+    }
 private:
     int _score; ///< Score of the woman's looks on the internationally acknowledged 1-10 scale.
 };
