@@ -120,6 +120,7 @@ namespace Hayai
 
 
             std::size_t index = 0;
+            std::size_t ran = 0; /// Number of executed tests
             while (index < instance._tests.size())
             {
                 // Get the test descriptor.
@@ -141,6 +142,8 @@ namespace Hayai
                 		continue;
                 	}
                 }
+
+                ran++;
 
                 // Get test instance, which will handle BeforeTest() and AfterTest() hooks.
                 Test* hooks = descriptor->Factory->CreateTest();
@@ -273,8 +276,8 @@ namespace Hayai
             // Final output.
             std::cout << Console::TextGreen << "[==========]"
                       << Console::TextDefault << " Ran "
-                      << instance._tests.size()
-                      << (instance._tests.size() == 1 ?
+                      << ran
+                      << (ran == 1 ?
                           " benchmark." : 
                           " benchmarks.")
                       << std::endl;
