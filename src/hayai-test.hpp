@@ -82,6 +82,7 @@ namespace Hayai
             return (endTime.tv_sec - startTime.tv_sec) * 1000000 + 
                    (endTime.tv_usec - startTime.tv_usec);
         }
+        virtual ~Test() {}
     protected:
         /// Test body.
         
