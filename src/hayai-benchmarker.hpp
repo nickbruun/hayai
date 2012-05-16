@@ -41,13 +41,15 @@ namespace Hayai
                                             const char* testName,
                                             std::size_t runs,
                                             std::size_t iterations,
-                                            TestFactory* testFactory)
+                                            TestFactory* testFactory,
+                                            std::string parameters = "")
         {
             TestDescriptor* descriptor = new TestDescriptor(fixtureName,
                                                             testName,
                                                             runs,
                                                             iterations,
-                                                            testFactory);
+                                                            testFactory,
+                                                            parameters);
                 
             Instance()._tests.push_back(descriptor);
 
@@ -126,7 +128,7 @@ namespace Hayai
                 // Check if test matches include filters
                 if(instance._include.size() > 0) {
                 	bool included = false;
-                	std::string name = descriptor->FixtureName + "." + descriptor->TestName;
+                	std::string name = descriptor->FixtureName + "." + descriptor->TestName+descriptor->Parameters;
 
                 	for(std::size_t i = 0; i <instance._include.size(); i++) {
                 		if(name.find(instance._include[i]) != std::string::npos) {
@@ -149,6 +151,7 @@ namespace Hayai
                           << Console::TextYellow << " "
                           << descriptor->FixtureName << "."
                           << descriptor->TestName
+                          << descriptor->Parameters
                           << Console::TextDefault
                           << " (" << descriptor->Runs
                           << (descriptor->Runs == 1 ? " run, " : " runs, ") 
@@ -203,6 +206,7 @@ namespace Hayai
                           << Console::TextYellow << " "
                           << descriptor->FixtureName << "."
                           << descriptor->TestName
+                          << descriptor->Parameters
                           << Console::TextDefault << " ("
                           << (double(timeTotal) / 1000.0) << " ms)"
                           << std::endl;

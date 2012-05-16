@@ -89,7 +89,8 @@ const ::Hayai::TestDescriptor* BENCHMARK_P_CLASS_NAME_(fixture_name, benchmark_n
         #fixture_name, #benchmark_name,                                                                 \
         BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::_runs,                                     \
 		BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::_iterations,                               \
-        new ::Hayai::TestFactoryDefault< BENCHMARK_P_CLASS_NAME_(fixture_name, benchmark_name, id) >());
+        new ::Hayai::TestFactoryDefault< BENCHMARK_P_CLASS_NAME_(fixture_name, benchmark_name, id) >(), \
+        #arguments);
 
 #define BENCHMARK_P_INSTANCE(fixture_name, benchmark_name, arguments)                 \
   BENCHMARK_P_INSTANCE1(fixture_name, benchmark_name, arguments, __COUNTER__)
