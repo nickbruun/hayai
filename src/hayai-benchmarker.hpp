@@ -79,12 +79,12 @@ namespace Hayai
                     double(deviated) - double(average);                 \
                                                                         \
                 PAD(description <<                                      \
-                    deviated << " "unit" (" <<                          \
+                    deviated << " " << unit << " (" <<                  \
                     (deviated < average ?                               \
                      Console::TextRed :                                 \
                      Console::TextGreen) <<                             \
                     (deviated > average ? "+" : "") <<                  \
-                    _d_ << " "unit" / " <<                              \
+                    _d_ << " " << unit << " / " <<                      \
                     (deviated > average ? "+" : "") <<                  \
                     (_d_ * 100.0 / average) << " %" <<                  \
                     Console::TextDefault << ")");                       \
@@ -99,12 +99,12 @@ namespace Hayai
                     double(deviated) - double(average);                 \
                                                                         \
                 PAD(description <<                                      \
-                    deviated << " "unit" (" <<                          \
+                    deviated << " " << unit << " (" <<                  \
                     (deviated > average ?                               \
                      Console::TextRed :                                 \
                      Console::TextGreen) <<                             \
                     (deviated > average ? "+" : "") <<                  \
-                    _d_ << " "unit" / " <<                              \
+                    _d_ << " " << unit << " / " <<                      \
                     (deviated > average ? "+" : "") <<                  \
                     (_d_ * 100.0 / average) << " %" <<                  \
                     Console::TextDefault << ")");                       \
