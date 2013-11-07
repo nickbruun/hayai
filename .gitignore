@@ -9,3 +9,6 @@ Makefile
 cmake_install.cmake
 *.a
 sample/sample
+
+# Ignore build directory
+/build*
