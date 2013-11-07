@@ -165,9 +165,9 @@ namespace Hayai
                           << std::endl;
                 
                 // Execute each individual run.
-                int64_t timeTotal = 0,
-                        timeRunMin = std::numeric_limits<int64_t>::max(),
-                        timeRunMax = std::numeric_limits<int64_t>::min();
+                int64_t timeTotalNs = 0,
+                        timeRunMinNs = std::numeric_limits<int64_t>::max(),
+                        timeRunMaxNs = std::numeric_limits<int64_t>::min();
 
                 std::size_t run = descriptor->Runs;
                 while (run--)
@@ -176,29 +176,33 @@ namespace Hayai
                     Test* test = descriptor->Factory->CreateTest();
                         
                     // Run the test.
-                    int64_t time = test->Run(descriptor->Iterations);
+                    int64_t timeNs = test->Run(descriptor->Iterations);
                     
                     // Store the test time.
-                    timeTotal += time;
-                    if (timeRunMin > time)
-                        timeRunMin = time;
-                    if (timeRunMax < time)
-                        timeRunMax = time;
+                    timeTotalNs += timeNs;
+                    if (timeRunMinNs > timeNs)
+                        timeRunMinNs = timeNs;
+                    if (timeRunMaxNs < timeNs)
+                        timeRunMaxNs = timeNs;
                     
                     // Dispose of the test instance.
                     delete test;
                 }
+
+                double timeTotal = (double)timeTotalNs / 1000.0;
+                double timeRunMin = (double)timeRunMinNs / 1000.0;
+                double timeRunMax = (double)timeRunMaxNs / 1000.0;
                 
                 // Calculate different metrics.
-                double timeRunAverage = double(timeTotal) / double(descriptor->Runs);
+                double timeRunAverage = timeTotal / (double(descriptor->Runs));
 
                 double runsPerSecondAverage = 1000000.0 / timeRunAverage;
-                double runsPerSecondMax = 1000000.0 / double(timeRunMin);
-                double runsPerSecondMin = 1000000.0 / double(timeRunMax);
+                double runsPerSecondMax = 1000000.0 / timeRunMin;
+                double runsPerSecondMin = 1000000.0 / timeRunMax;
                 
                 double timeIterationAverage = timeRunAverage / double(descriptor->Iterations);
-                double timeIterationMin = double(timeRunMin) / double(descriptor->Iterations);
-                double timeIterationMax = double(timeRunMax) / double(descriptor->Iterations);
+                double timeIterationMin = timeRunMin / double(descriptor->Iterations);
+                double timeIterationMax = timeRunMax / double(descriptor->Iterations);
 
                 double iterationsPerSecondAverage = 1000000.0 / timeIterationAverage;
                 double iterationsPerSecondMax = 1000000.0 / timeIterationMin;
@@ -211,7 +215,7 @@ namespace Hayai
                           << descriptor->TestName
                           << descriptor->Parameters
                           << Console::TextDefault << " ("
-                          << (double(timeTotal) / 1000.0) << " ms)"
+                          << (timeTotal / 1000.0) << " ms)"
                           << std::endl;
                 
                 std::cout << Console::TextBlue << "[   RUNS   ] "

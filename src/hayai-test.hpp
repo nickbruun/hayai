@@ -1,6 +1,7 @@
 #include <cstddef>
-#include <sys/time.h>
 #include <stdint.h>
+
+#include "hayai-timer.hpp"
 
 #ifndef __HAYAI_TEST
 #define __HAYAI_TEST
@@ -53,34 +54,28 @@ namespace Hayai
         /// Run the test.
         
         /// @param iterations Number of iterations to gather data for.
-        /// @returns the number of microseconds the run took.
+        /// @returns the number of nanoseconds the run took.
         int64_t Run(std::size_t iterations)
         {
             // Set up the testing fixture.
             this->SetUp();
-            
+
             // Get the starting time.
-            struct timeval startTime,
-                           endTime;
-            
-            gettimeofday(&startTime,
-                         NULL);
-            
+            HighResolutionTimer::CpuTime startTime = 
+                HighResolutionTimer::getCpuTime();
             // Run the test body for each iteration.
             std::size_t iteration = iterations;
             while (iteration--)
                 this->TestBody();
             
-            // Get the ending time.
-            gettimeofday(&endTime,
-                         NULL);
+            HighResolutionTimer::CpuTime endTime = 
+                HighResolutionTimer::getCpuTime();
             
             // Tear down the testing fixture.
             this->TearDown();
             
-            // Return the duration in microseconds.
-            return (endTime.tv_sec - startTime.tv_sec) * 1000000 + 
-                   (endTime.tv_usec - startTime.tv_usec);
+            // Return the duration in nanoseconds.
+            return HighResolutionTimer::getDuration(startTime, endTime);
         }
         virtual ~Test() {}
     protected:

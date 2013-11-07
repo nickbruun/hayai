@@ -3,6 +3,9 @@
 #include "hayai-defaulttestfactory.hpp"
 #include "hayai-fixture.hpp"
 
+#ifndef __HAYAI_
+#define __HAYAI_
+
 #define BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name) \
     fixture_name ## _ ## benchmark_name ## _Benchmark
 
@@ -94,3 +97,5 @@ const ::Hayai::TestDescriptor* BENCHMARK_P_CLASS_NAME_(fixture_name, benchmark_n
 
 #define BENCHMARK_P_INSTANCE(fixture_name, benchmark_name, arguments)                 \
   BENCHMARK_P_INSTANCE1(fixture_name, benchmark_name, arguments, __COUNTER__)
+
+#endif // __HAYAI_
