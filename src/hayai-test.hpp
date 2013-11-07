@@ -36,7 +36,10 @@ namespace Hayai
         /// Method is called before test execution, may be useful for statistics collection.
         virtual void BeforeTest(std::string FixtureName, std::string TestName, std::size_t runs, std::size_t iterations)
         {
-
+            (void)FixtureName;
+            (void)TestName;
+            (void)runs;
+            (void)iterations;
         }
 
         /// Method is called after test execution finished, provided execution stats.
@@ -47,7 +50,16 @@ namespace Hayai
         		double iterationsPerSecondAverage, double iterationsPerSecondMax, double iterationsPerSecondMin
         		)
         {
-
+            (void)timeRunAverage;
+            (void)runsPerSecondAverage;
+            (void)runsPerSecondMax;
+            (void)runsPerSecondMin;
+            (void)timeIterationAverage;
+            (void)timeIterationMax;
+            (void)timeIterationMin;
+            (void)iterationsPerSecondAverage;
+            (void)iterationsPerSecondMax;
+            (void)iterationsPerSecondMin;
         }
 
         

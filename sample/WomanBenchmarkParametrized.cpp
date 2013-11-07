@@ -41,7 +41,7 @@ public:
 	virtual void SetUp() {
 		this->prettyGirl = new Woman(9);
 		this->bankAccount = 30000;
-		std::srand(std::time(0));
+		std::srand(static_cast<unsigned int>(std::time(0)));
 	}
 
 	virtual void TearDown() {
@@ -84,6 +84,7 @@ BENCHMARK_P_F(GentlemanFixture, TryToMarry, 10, 100, (std::size_t flowerTimes, s
 		// Be happy :-)
 		happy = true;
 	}
+    (void)happy;
 }
 
 /*

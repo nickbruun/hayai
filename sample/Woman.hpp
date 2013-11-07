@@ -26,6 +26,8 @@ public:
     static void MakeSomeCoffee(int count,
                                Unit unit)
     {
+        (void)count;
+        (void)unit;
         // Waste some clock cycles here. Women do that a lot anyway.
         std::size_t largeNumber = 1000000u;
         while (largeNumber--)

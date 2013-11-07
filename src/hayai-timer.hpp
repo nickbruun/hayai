@@ -194,6 +194,7 @@ namespace Hayai
             case CpuTime::ERROR:
                 return -1;
         }
+        return -1;
     #endif
     }
 
@@ -224,6 +225,8 @@ namespace Hayai
                 break;
             case CpuTime::CLOCKT:
                 time2.value.clockT -= time1.value.clockT;
+                break;
+            case CpuTime::ERROR:
                 break;
         }
         return time2;
