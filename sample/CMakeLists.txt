@@ -6,6 +6,7 @@ add_executable(sample
   WomanBenchmark.cpp
   WomanBenchmarkWithFixture.cpp
   WomanBenchmarkParametrized.cpp
+  SomeSleep.cpp
 )
 
 target_link_libraries(sample

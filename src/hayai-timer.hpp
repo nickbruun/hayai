@@ -7,8 +7,10 @@ http://nadeausoftware.com/articles/2012/03/c_c_tip_how_measure_cpu_time_benchmar
 */
 
 #if defined(_WIN32)
+#ifndef NOMINMAX
 #define NOMINMAX
-#include <Windows.h>
+#endif
+#include <windows.h>
 
 #elif defined(__unix__) || defined(__unix) || defined(unix) || (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>
@@ -90,22 +92,8 @@ namespace Hayai
         #if defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0)
         /* Prefer high-res POSIX timers, when available. */
         {
-            clockid_t id;
             struct timespec ts;
-            #if _POSIX_CPUTIME > 0
-            /* Clock ids vary by OS.  Query the id, if possible. */
-            if ( clock_getcpuclockid( 0, &id ) == -1 )
-            #endif
-                #if defined(CLOCK_PROCESS_CPUTIME_ID)
-                /* Use known clock id for AIX, Linux, or Solaris. */
-                id = CLOCK_PROCESS_CPUTIME_ID;
-                #elif defined(CLOCK_VIRTUAL)
-                /* Use known clock id for BSD or HP-UX. */
-                id = CLOCK_VIRTUAL;
-                #else
-                id = (clockid_t)-1;
-                #endif
-            if ( id != (clockid_t)-1 && clock_gettime( id, &ts ) != -1 ) {
+            if (clock_gettime(CLOCK_REALTIME, &ts ) != -1) {
                 result.value.nsec = ts.tv_sec * 1e9 + ts.tv_nsec;
                 result.type = CpuTime::NSEC;
                 return result;
@@ -161,7 +149,7 @@ namespace Hayai
 		const static LARGE_INTEGER performanceFrequency = getPerformanceFrequency();
         const CpuTime overhead = getOverhead();
         LONGLONG duration = endTime.QuadPart - startTime.QuadPart - overhead.QuadPart;
-        return static_cast<int64_t>((double)duration * 1e6
+        return static_cast<int64_t>((double)duration * 1e9
              / performanceFrequency.QuadPart);
     #elif defined(__unix__) || defined(__unix) || defined(unix) || (defined(__APPLE__) && defined(__MACH__))
     /* AIX, BSD, Cygwin, HP-UX, Linux, OSX, and Solaris --------- */
