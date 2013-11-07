@@ -77,7 +77,7 @@ namespace Hayai
                       << std::endl;
 
             // Run through all the tests in ascending order.
-#define PAD(x) std::cout << std::setw(34) << x << std::endl;
+#define PAD(x) std::cout << std::setw(24) << x << std::endl;
 #define PAD_DEVIATION(description,                                      \
                       deviated,                                         \
                       average,                                          \
@@ -220,8 +220,9 @@ namespace Hayai
                 
                 std::cout << Console::TextBlue << "[   RUNS   ] "
                           << Console::TextDefault
-                          << "       Average time: " << timeRunAverage
-                          << " us" << std::endl;
+                          << std::endl;
+
+                PAD("Average time: " << timeRunAverage << " us");
                 
                 PAD_DEVIATION_INVERSE("Fastest: ",
                               timeRunMin,
@@ -244,8 +245,9 @@ namespace Hayai
 
                 std::cout << Console::TextBlue << "[ITERATIONS] "
                           << Console::TextDefault
-                          << "       Average time: " << timeIterationAverage
-                          << " us" << std::endl;
+                          << std::endl;
+
+                PAD("Average time: " << timeIterationAverage << " us");
                 
                 PAD_DEVIATION_INVERSE("Fastest: ",
                               timeIterationMin,
