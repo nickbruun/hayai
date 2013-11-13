@@ -18,6 +18,10 @@ http://nadeausoftware.com/articles/2012/03/c_c_tip_how_measure_cpu_time_benchmar
 #include <sys/times.h>
 #include <time.h>
 
+#if defined(__MACH__)
+#include <mach/mach_time.h>
+#endif 
+
 #else
 #error "Unable to define high resolution timer for an unknown OS."
 #endif
@@ -38,6 +42,7 @@ namespace Hayai
             union Value {
                 int64_t nsec;
                 int64_t usec;
+                uint64_t mach;
                 clock_t systck;
                 clock_t clockT;
             } value;
@@ -46,6 +51,7 @@ namespace Hayai
                 ERROR,
                 NSEC,
                 USEC,
+                MACH,
                 SYSTCK,
                 CLOCKT
             } type;
@@ -94,10 +100,19 @@ namespace Hayai
         {
             struct timespec ts;
             if (clock_gettime(CLOCK_REALTIME, &ts ) != -1) {
-                result.value.nsec = ts.tv_sec * 1e9 + ts.tv_nsec;
+                result.value.nsec = ts.tv_sec * 1000000000 + ts.tv_nsec;
                 result.type = CpuTime::NSEC;
                 return result;
             }
+        }
+        #endif
+        
+        #if defined(__MACH__)
+        /* High-res mac os x timer. */
+        {
+            result.value.mach = mach_absolute_time();
+            result.type = CpuTime::MACH;
+            return result;
         }
         #endif
 
@@ -106,7 +121,7 @@ namespace Hayai
             struct rusage rusage;
             if ( getrusage( RUSAGE_SELF, &rusage ) != -1 ) {
                 result.value.usec = 
-                    rusage.ru_utime.tv_sec * 1e6 + rusage.ru_utime.tv_usec;
+                    rusage.ru_utime.tv_sec * 1000000 + rusage.ru_utime.tv_usec;
                 result.type = CpuTime::USEC;
                 return result;
             }
@@ -149,7 +164,7 @@ namespace Hayai
 		const static LARGE_INTEGER performanceFrequency = getPerformanceFrequency();
         const CpuTime overhead = getOverhead();
         LONGLONG duration = endTime.QuadPart - startTime.QuadPart - overhead.QuadPart;
-        return static_cast<int64_t>((double)duration * 1e9
+        return static_cast<int64_t>((double)duration * 1000000000
              / performanceFrequency.QuadPart);
     #elif defined(__unix__) || defined(__unix) || defined(unix) || (defined(__APPLE__) && defined(__MACH__))
     /* AIX, BSD, Cygwin, HP-UX, Linux, OSX, and Solaris --------- */
@@ -165,7 +180,23 @@ namespace Hayai
                     - overhead.value.nsec;
             case CpuTime::USEC: 
                 return (endTime.value.usec - startTime.value.usec 
-                    - overhead.value.nsec) * 1e3;
+                    - overhead.value.nsec) * 1000;
+            case CpuTime::MACH:
+            {
+                #if defined(__MACH__)
+                static double conversion = 0.0;
+                if (conversion == 0.0)
+                {
+                    mach_timebase_info_data_t info;
+                    kern_return_t err = mach_timebase_info(&info);
+                    if (err == 0) {
+                        conversion = (double)info.numer / (double)info.denom;
+                    }
+                }
+                return static_cast<int64_t>((endTime.value.mach - startTime.value.mach)
+                    * conversion);
+                #endif
+            }
             case CpuTime::SYSTCK: 
             {
                 #if defined(_SC_CLK_TCK)
@@ -174,7 +205,7 @@ namespace Hayai
                     endTime.value.systck - startTime.value.systck 
                     - overhead.value.systck;
                 return static_cast<int64_t>((double)diffTime 
-                    * 1e9 / ticks);
+                    * 1000000000 / ticks);
                 #else
                 return -1;
                 #endif
@@ -186,7 +217,7 @@ namespace Hayai
                     endTime.value.clockT - startTime.value.clockT
                     - overhead.value.clockT;
                 return static_cast<int64_t>((double)diffTime
-                    * 1e9 / (double)CLOCKS_PER_SEC);
+                    * 1000000000 / (double)CLOCKS_PER_SEC);
                 #else
                 return -1;
                 #endif
@@ -219,6 +250,9 @@ namespace Hayai
                 break;
             case CpuTime::USEC: 
                 time2.value.usec -= time1.value.usec;
+                break;
+            case CpuTime::MACH:
+                time2.value.mach -= time1.value.mach;
                 break;
             case CpuTime::SYSTCK: 
                 time2.value.systck -= time1.value.systck;

@@ -14,7 +14,7 @@
  * Number of arguments is not limited, just make sure that
  * brackets around them are present.
  */
-BENCHMARK_P(Woman, MakeMoreCoffie, 10, 100, (std::size_t coffieCups)) {
+BENCHMARK_P(Woman, MakeMoreCoffie, 10, 100, (int coffieCups)) {
 	Woman::MakeSomeCoffee(coffieCups, UnitCup);
 }
 
