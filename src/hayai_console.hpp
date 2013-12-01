@@ -2,7 +2,7 @@
 
 #ifndef __HAYAI_CONSOLE
 #define __HAYAI_CONSOLE
-namespace Hayai
+namespace hayai
 {
     /// Static helper class for outputting to a terminal/console.
     class Console

@@ -2,7 +2,7 @@
 #define __HAYAI_TESTFACTORY
 #include "hayai_test.hpp"
 
-namespace Hayai
+namespace hayai
 {
     /// Base class for test factory implementations.
     class TestFactory

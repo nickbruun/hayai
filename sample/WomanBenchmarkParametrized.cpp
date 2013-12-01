@@ -35,7 +35,7 @@ BENCHMARK_P_INSTANCE(Woman, MakeMoreCoffie, (4));
  * Base fixture class. Skip it, if you're a busy guy.
  */
 class GentlemanFixture
-    :   public ::Hayai::Fixture
+    :   public ::hayai::Fixture
 {
 protected:
     Woman* PrettyGirl;

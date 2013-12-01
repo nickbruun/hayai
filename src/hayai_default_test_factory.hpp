@@ -2,7 +2,7 @@
 #define __HAYAI_DEFAULTTESTFACTORY
 #include "hayai_test_factory.hpp"
 
-namespace Hayai
+namespace hayai
 {
     /// Default test factory implementation.
     

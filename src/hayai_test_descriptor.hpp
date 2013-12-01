@@ -5,7 +5,7 @@
 #include "hayai_test.hpp"
 #include "hayai_test_factory.hpp"
 
-namespace Hayai
+namespace hayai
 {
     /// Test descriptor.
 

@@ -2,9 +2,9 @@
 
 int main()
 {
-    Hayai::ConsoleOutputter consoleOutputter;
+    hayai::ConsoleOutputter consoleOutputter;
 
-    Hayai::Benchmarker::AddOutputter(consoleOutputter);
-    Hayai::Benchmarker::RunAllTests();
+    hayai::Benchmarker::AddOutputter(consoleOutputter);
+    hayai::Benchmarker::RunAllTests();
     return 0;
 }

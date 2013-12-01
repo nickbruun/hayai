@@ -1,6 +1,6 @@
 #ifndef __HAYAI_TESTRESULT
 #define __HAYAI_TESTRESULT
-namespace Hayai
+namespace hayai
 {
     /// Test result descriptor.
 

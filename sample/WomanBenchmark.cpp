@@ -3,6 +3,5 @@
 
 BENCHMARK(Woman, MakeSomeCoffee, 10, 100)
 {
-    Woman::MakeSomeCoffee(10,
-                          UnitCup);
+    Woman::MakeSomeCoffee(10, UnitCup);
 }

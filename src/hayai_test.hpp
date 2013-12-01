@@ -6,7 +6,7 @@
 
 #include "hayai_test_result.hpp"
 
-namespace Hayai
+namespace hayai
 {
     /// Base test class.
     

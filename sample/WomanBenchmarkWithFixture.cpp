@@ -3,7 +3,7 @@
 #include "Woman.hpp"
 
 class WomanFixture
-    :   public Hayai::Fixture
+    :   public ::hayai::Fixture
 {
 public:
     virtual void SetUp()

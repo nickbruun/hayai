@@ -25,15 +25,15 @@
     protected:                                                          \
         virtual void TestBody();                                        \
     private:                                                            \
-        static const ::Hayai::TestDescriptor* _descriptor;              \
+        static const ::hayai::TestDescriptor* _descriptor;              \
     };                                                                  \
                                                                         \
-    const ::Hayai::TestDescriptor* BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::_descriptor = \
-        ::Hayai::Benchmarker::Instance().RegisterTest(#fixture_name,    \
+    const ::hayai::TestDescriptor* BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::_descriptor = \
+        ::hayai::Benchmarker::Instance().RegisterTest(#fixture_name,    \
                                                       #benchmark_name,  \
                                                       runs,             \
                                                       iterations,       \
-                                                      new ::Hayai::TestFactoryDefault<BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)>()); \
+                                                      new ::hayai::TestFactoryDefault<BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)>()); \
                                                                         \
     void BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::TestBody()
 
@@ -53,7 +53,7 @@
                   iterations)                            \
     BENCHMARK_(fixture_name,                             \
                benchmark_name,                           \
-               ::Hayai::Test,                            \
+               ::hayai::Test,                            \
                runs,                                     \
                iterations)
 
@@ -71,7 +71,7 @@
     void BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::TestPayload arguments
 
 #define BENCHMARK_P(fixture_name, benchmark_name, runs, iterations, arguments) \
-        BENCHMARK_P_(fixture_name, benchmark_name, Hayai::Fixture, runs, iterations, arguments)
+        BENCHMARK_P_(fixture_name, benchmark_name, hayai::Fixture, runs, iterations, arguments)
 
 #define BENCHMARK_P_F(fixture_name, benchmark_name, runs, iterations, arguments) \
         BENCHMARK_P_(fixture_name, benchmark_name, fixture_name, runs, iterations, arguments)
@@ -85,14 +85,14 @@
     protected:                                                          \
         virtual void TestBody() { this->TestPayload arguments; }        \
     private:                                                            \
-        static const ::Hayai::TestDescriptor* _descriptor;              \
+        static const ::hayai::TestDescriptor* _descriptor;              \
     };                                                                  \
-    const ::Hayai::TestDescriptor* BENCHMARK_P_CLASS_NAME_(fixture_name, benchmark_name, id)::_descriptor = \
-        ::Hayai::Benchmarker::Instance().RegisterTest(                  \
+    const ::hayai::TestDescriptor* BENCHMARK_P_CLASS_NAME_(fixture_name, benchmark_name, id)::_descriptor = \
+        ::hayai::Benchmarker::Instance().RegisterTest(                  \
             #fixture_name, #benchmark_name,                             \
             BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::_runs, \
             BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::_iterations, \
-            new ::Hayai::TestFactoryDefault< BENCHMARK_P_CLASS_NAME_(fixture_name, benchmark_name, id) >(), \
+            new ::hayai::TestFactoryDefault< BENCHMARK_P_CLASS_NAME_(fixture_name, benchmark_name, id) >(), \
             #arguments);
 
 #define BENCHMARK_P_INSTANCE(fixture_name, benchmark_name, arguments)   \

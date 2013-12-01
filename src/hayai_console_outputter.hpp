@@ -3,7 +3,7 @@
 #include "hayai_outputter.hpp"
 #include "hayai_console.hpp"
 
-namespace Hayai
+namespace hayai
 {
     /// Console outputter.
 

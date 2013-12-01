@@ -12,7 +12,7 @@
 #include "hayai_test_result.hpp"
 #include "hayai_console_outputter.hpp"
 
-namespace Hayai
+namespace hayai
 {
     /// Benchmarking execution controller singleton.
     class Benchmarker

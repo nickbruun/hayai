@@ -2,7 +2,7 @@
 #define __HAYAI_FIXTURE
 #include "hayai_test.hpp"
 
-namespace Hayai
+namespace hayai
 {
     typedef Test Fixture;
 }
