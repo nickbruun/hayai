@@ -7,10 +7,10 @@
 #include <string>
 #include <fstream>
 
-#include "hayai-testfactory.hpp"
-#include "hayai-testdescriptor.hpp"
-#include "hayai-testresult.hpp"
-#include "hayai-consoleoutputter.hpp"
+#include "hayai_test_factory.hpp"
+#include "hayai_test_descriptor.hpp"
+#include "hayai_test_result.hpp"
+#include "hayai_console_outputter.hpp"
 
 namespace Hayai
 {

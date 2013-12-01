@@ -1,9 +1,10 @@
-#include "hayai-benchmarker.hpp"
-#include "hayai-test.hpp"
-#include "hayai-defaulttestfactory.hpp"
-#include "hayai-fixture.hpp"
-#include "hayai-outputter.hpp"
-#include "hayai-consoleoutputter.hpp"
+#include "hayai_benchmarker.hpp"
+#include "hayai_test.hpp"
+#include "hayai_default_test_factory.hpp"
+#include "hayai_fixture.hpp"
+#include "hayai_console_outputter.hpp"
+
+#ifndef __HAYAI
 
 #define BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name) \
     fixture_name ## _ ## benchmark_name ## _Benchmark
@@ -96,3 +97,5 @@
 
 #define BENCHMARK_P_INSTANCE(fixture_name, benchmark_name, arguments)   \
     BENCHMARK_P_INSTANCE1(fixture_name, benchmark_name, arguments, __COUNTER__)
+
+#endif

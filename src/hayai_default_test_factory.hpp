@@ -1,7 +1,7 @@
-#include "hayai-testfactory.hpp"
-
 #ifndef __HAYAI_DEFAULTTESTFACTORY
 #define __HAYAI_DEFAULTTESTFACTORY
+#include "hayai_test_factory.hpp"
+
 namespace Hayai
 {
     /// Default test factory implementation.

@@ -1,11 +1,10 @@
+#ifndef __HAYAI_TEST
+#define __HAYAI_TEST
 #include <cstddef>
 #include <sys/time.h>
 #include <stdint.h>
 
-
-#ifndef __HAYAI_TEST
-#define __HAYAI_TEST
-#include "hayai-testresult.hpp"
+#include "hayai_test_result.hpp"
 
 namespace Hayai
 {

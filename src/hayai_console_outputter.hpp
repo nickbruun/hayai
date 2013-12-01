@@ -1,7 +1,7 @@
 #ifndef __HAYAI_CONSOLEOUTPUTTER
 #define __HAYAI_CONSOLEOUTPUTTER
-#include "hayai-outputter.hpp"
-#include "hayai-console.hpp"
+#include "hayai_outputter.hpp"
+#include "hayai_console.hpp"
 
 namespace Hayai
 {

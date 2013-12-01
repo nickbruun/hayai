@@ -1,3 +1,3 @@
 add_library(hayai_main
-  hayai-posixmain.cpp
+  hayai_posix_main.cpp
 )

@@ -1,7 +1,7 @@
 #ifndef __HAYAI_OUTPUTTER
 #define __HAYAI_OUTPUTTER
 #include <cstddef>
-#include "hayai-testresult.hpp"
+#include "hayai_test_result.hpp"
 
 namespace Hayai
 {

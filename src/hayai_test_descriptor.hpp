@@ -1,10 +1,10 @@
-#include <string>
-
-#include "hayai-test.hpp"
-#include "hayai-testfactory.hpp"
-
 #ifndef __HAYAI_TESTDESCRIPTOR
 #define __HAYAI_TESTDESCRIPTOR
+#include <string>
+
+#include "hayai_test.hpp"
+#include "hayai_test_factory.hpp"
+
 namespace Hayai
 {
     /// Test descriptor.
