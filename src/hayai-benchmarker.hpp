@@ -154,14 +154,6 @@ namespace Hayai
 
                 testsRun++;
 
-                // Get test instance, which will handle BeforeTest() and
-                // AfterTest() hooks.
-                Test* hooks = descriptor->Factory->CreateTest();
-                hooks->BeforeTest(descriptor->FixtureName,
-                                  descriptor->TestName,
-                                  descriptor->Runs,
-                                  descriptor->Iterations);
-
                 // Describe the beginning of the run.
                 std::cout << Console::TextGreen << "[ RUN      ]"
                           << Console::TextYellow << " "
@@ -271,9 +263,6 @@ namespace Hayai
                               testResult.IterationsPerSecondMinimum(),
                               testResult.IterationsPerSecondAverage(),
                               "iterations/s");
-
-                hooks->AfterRun(testResult);
-                delete hooks;
             }
 
 #undef PAD_DEVIATION_INVERSE

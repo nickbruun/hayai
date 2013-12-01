@@ -34,21 +34,6 @@ namespace Hayai
         {
             
         }
-        
-        /// Method is called before test execution, may be useful for statistics collection.
-        virtual void BeforeTest(std::string FixtureName, std::string TestName, std::size_t runs, std::size_t iterations)
-        {
-
-        }
-
-
-        /// Post-execution hook.
-
-        /// @param result Benchmark result.
-        virtual void AfterRun(TestResult result)
-        {
-
-        }
 
 
         /// Run the test.
@@ -61,11 +46,9 @@ namespace Hayai
             SetUp();
 
             // Get the starting time.
-            struct timeval startTime,
-                           endTime;
+            struct timeval startTime, endTime;
 
-            gettimeofday(&startTime,
-                         NULL);
+            gettimeofday(&startTime, NULL);
 
             // Run the test body for each iteration.
             std::size_t iteration = iterations;
