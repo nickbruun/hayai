@@ -20,16 +20,19 @@ namespace Hayai
         /// @param runs Number of runs for the test.
         /// @param iterations Number of iterations per run.
         /// @param testFactory Test factory implementation for the test.
+        /// @param parameters Parametrized test parameters.
         TestDescriptor(const char* fixtureName,
                        const char* testName,
                        std::size_t runs,
                        std::size_t iterations,
-                       TestFactory* testFactory)
+                       TestFactory* testFactory,
+                       std::string parameters = "")
             :   FixtureName(fixtureName),
                 TestName(testName),
                 Runs(runs),
                 Iterations(iterations),
-                Factory(testFactory)
+                Factory(testFactory),
+                Parameters(parameters)
         {
             
         }
@@ -60,6 +63,9 @@ namespace Hayai
         
         /// Test factory.
         TestFactory* Factory;
+
+        /// Parameters for parametrized tests
+        std::string Parameters;
     };
 }
 #endif

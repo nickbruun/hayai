@@ -2,6 +2,8 @@
 #include <iostream>
 #include <limits>
 #include <iomanip>
+#include <string>
+#include <fstream>
 
 #include "hayai-console.hpp"
 #include "hayai-testfactory.hpp"
@@ -39,17 +41,23 @@ namespace Hayai
                                             const char* testName,
                                             std::size_t runs,
                                             std::size_t iterations,
-                                            TestFactory* testFactory)
+                                            TestFactory* testFactory,
+                                            std::string parameters = "")
         {
             TestDescriptor* descriptor = new TestDescriptor(fixtureName,
                                                             testName,
                                                             runs,
                                                             iterations,
-                                                            testFactory);
+                                                            testFactory,
+                                                            parameters);
                 
             Instance()._tests.push_back(descriptor);
 
             return descriptor;
+        }
+
+        static void AddIncludeFilter(std::string pattern) {
+        	Instance()._include.push_back(pattern);
         }
             
             
@@ -112,16 +120,42 @@ namespace Hayai
 
 
             std::size_t index = 0;
+            std::size_t ran = 0; /// Number of executed tests
             while (index < instance._tests.size())
             {
                 // Get the test descriptor.
                 TestDescriptor* descriptor = instance._tests[index++];
+
+                // Check if test matches include filters
+                if(instance._include.size() > 0) {
+                	bool included = false;
+                	std::string name = descriptor->FixtureName + "." + descriptor->TestName+descriptor->Parameters;
+
+                	for(std::size_t i = 0; i <instance._include.size(); i++) {
+                		if(name.find(instance._include[i]) != std::string::npos) {
+                			included = true;
+                			break;
+                		}
+                	}
+
+                	if(!included) {
+                		continue;
+                	}
+                }
+
+                ran++;
+
+                // Get test instance, which will handle BeforeTest() and AfterTest() hooks.
+                Test* hooks = descriptor->Factory->CreateTest();
+                hooks->BeforeTest(descriptor->FixtureName, descriptor->TestName, descriptor->Runs, descriptor->Iterations);
                
                 // Describe the beginning of the run.
                 std::cout << Console::TextGreen << "[ RUN      ]"
-                          << Console::TextDefault << " "
+                          << Console::TextYellow << " "
                           << descriptor->FixtureName << "."
                           << descriptor->TestName
+                          << descriptor->Parameters
+                          << Console::TextDefault
                           << " (" << descriptor->Runs
                           << (descriptor->Runs == 1 ? " run, " : " runs, ") 
                           << descriptor->Iterations
@@ -172,13 +206,15 @@ namespace Hayai
 
                 // Describe the end of the run.
                 std::cout << Console::TextGreen << "[     DONE ]"
-                          << Console::TextDefault << " "
+                          << Console::TextYellow << " "
                           << descriptor->FixtureName << "."
-                          << descriptor->TestName << " ("
+                          << descriptor->TestName
+                          << descriptor->Parameters
+                          << Console::TextDefault << " ("
                           << (double(timeTotal) / 1000.0) << " ms)"
                           << std::endl;
                 
-                std::cout << Console::TextYellow << "[   RUNS   ] "
+                std::cout << Console::TextBlue << "[   RUNS   ] "
                           << Console::TextDefault
                           << "       Average time: " << timeRunAverage
                           << " us" << std::endl;
@@ -202,7 +238,7 @@ namespace Hayai
                               runsPerSecondAverage,
                               "runs/s");
 
-                std::cout << Console::TextYellow << "[ITERATIONS] "
+                std::cout << Console::TextBlue << "[ITERATIONS] "
                           << Console::TextDefault
                           << "       Average time: " << timeIterationAverage
                           << " us" << std::endl;
@@ -225,6 +261,14 @@ namespace Hayai
                               iterationsPerSecondMin,
                               iterationsPerSecondAverage,
                               "iterations/s");
+
+                hooks->AfterRun(
+                		timeRunAverage,
+						runsPerSecondAverage, runsPerSecondMax, runsPerSecondMin,
+						timeIterationAverage, timeIterationMax, timeIterationMin,
+						iterationsPerSecondAverage, iterationsPerSecondMax, iterationsPerSecondMin
+                		);
+                delete hooks;
             }
 
 #undef PAD
@@ -232,12 +276,13 @@ namespace Hayai
             // Final output.
             std::cout << Console::TextGreen << "[==========]"
                       << Console::TextDefault << " Ran "
-                      << instance._tests.size()
-                      << (instance._tests.size() == 1 ?
+                      << ran
+                      << (ran == 1 ?
                           " benchmark." : 
                           " benchmarks.")
                       << std::endl;
         }
+
     private:
         /// Private constructor.
         Benchmarker()
@@ -255,8 +300,9 @@ namespace Hayai
                 delete this->_tests[index];
         }
             
-            
+
         std::vector<TestDescriptor*> _tests; ///< Registered tests.
+        std::vector<std::string> _include; /// Test filters.
     };
 }
 #endif

@@ -32,6 +32,23 @@ namespace Hayai
             
         }
         
+        /// Method is called before test execution, may be useful for statistics collection.
+        virtual void BeforeTest(std::string FixtureName, std::string TestName, std::size_t runs, std::size_t iterations)
+        {
+
+        }
+
+        /// Method is called after test execution finished, provided execution stats.
+        virtual void AfterRun(
+        		double timeRunAverage,
+        		double runsPerSecondAverage, double runsPerSecondMax, double runsPerSecondMin,
+        		double timeIterationAverage, double timeIterationMax, double timeIterationMin,
+        		double iterationsPerSecondAverage, double iterationsPerSecondMax, double iterationsPerSecondMin
+        		)
+        {
+
+        }
+
         
         /// Run the test.
         
@@ -65,6 +82,7 @@ namespace Hayai
             return (endTime.tv_sec - startTime.tv_sec) * 1000000 + 
                    (endTime.tv_usec - startTime.tv_usec);
         }
+        virtual ~Test() {}
     protected:
         /// Test body.
         

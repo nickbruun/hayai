@@ -5,6 +5,7 @@ include_directories(
 add_executable(sample
   WomanBenchmark.cpp
   WomanBenchmarkWithFixture.cpp
+  WomanBenchmarkParametrized.cpp
 )
 
 target_link_libraries(sample
