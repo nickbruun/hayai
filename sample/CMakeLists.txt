@@ -3,9 +3,10 @@ include_directories(
 )
 
 add_executable(sample
-  WomanBenchmark.cpp
-  WomanBenchmarkWithFixture.cpp
-  WomanBenchmarkParametrized.cpp
+  delivery_man_benchmark.cpp
+  delivery_man_benchmark_with_fixture.cpp
+  delivery_man_benchmark_parameterized.cpp
+  delivery_man_benchmark_parameterized_with_fixture.cpp
 )
 
 target_link_libraries(sample
