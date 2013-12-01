@@ -14,8 +14,9 @@
  * Number of arguments is not limited, just make sure that
  * brackets around them are present.
  */
-BENCHMARK_P(Woman, MakeMoreCoffie, 10, 100, (std::size_t coffieCups)) {
-	Woman::MakeSomeCoffee(coffieCups, UnitCup);
+BENCHMARK_P(Woman, MakeMoreCoffie, 10, 100, (std::size_t coffieCups))
+{
+    Woman::MakeSomeCoffee(coffieCups, UnitCup);
 }
 
 /*
@@ -33,57 +34,65 @@ BENCHMARK_P_INSTANCE(Woman, MakeMoreCoffie, (4));
 /*
  * Base fixture class. Skip it, if you're a busy guy.
  */
-class GentlemanFixture : public ::Hayai::Fixture {
+class GentlemanFixture
+    :   public ::Hayai::Fixture
+{
 protected:
-	Woman* prettyGirl;
-	int bankAccount;
+    Woman* PrettyGirl;
+    int BankAccount;
 public:
-	virtual void SetUp() {
-		this->prettyGirl = new Woman(9);
-		this->bankAccount = 30000;
-		std::srand(std::time(0));
-	}
+    virtual void SetUp()
+    {
+        PrettyGirl = new Woman(9);
+        BankAccount = 30000;
+        std::srand(std::time(0));
+    }
 
-	virtual void TearDown() {
-		delete this->prettyGirl;
-	}
+    virtual void TearDown()
+    {
+        delete PrettyGirl;
+    }
 
-	/* This is stuff every gentleman should do. */
+    bool BuyFlowers(Woman* girl, std::size_t times)
+    {
+        for (std::size_t i = 0; i < times; i++)
+            BankAccount -= 100 * girl->getScore() * ((std::rand() % 2) + 1);
 
-	bool buyFlowers(Woman* girl, std::size_t times) {
-		for(std::size_t i = 0; i < times; i++) {
-			this->bankAccount -= 100 * girl->getScore() * ((std::rand() % 2) + 1);
-		}
-		return (std::rand() % 100) > 70;
-	}
+        return (std::rand() % 100) > 70;
+    }
 
-	bool date(Woman* girl, std::size_t times) {
-		for(std::size_t i = 0; i < times; i++) {
-			this->bankAccount -= 100 * girl->getScore() * ((std::rand() % 5) + 1);
-		}
-		return (std::rand() % 100) > 70;
-	}
+    bool Date(Woman* girl, std::size_t times)
+    {
+        for (std::size_t i = 0; i < times; i++)
+        {
+            BankAccount -= 100 * girl->getScore() * ((std::rand() % 5) + 1);
+        }
 
-	bool marry(Woman* girl) {
-		if(this->bankAccount <= 0)
-			return false;
-		girl->SpendSomeMoney();
-		return true;
-	}
+        return (std::rand() % 100) > 70;
+    }
+
+    bool Marry(Woman* girl)
+    {
+        if (BankAccount <= 0)
+            return false;
+        girl->SpendSomeMoney();
+        return true;
+    }
 }; /* Large fixture, gentlemans life is so complicated... */
 
 /*
  * Note _F suffix in macro name. Hayai will pick up GentlemanFixture and use it.
  * Also note, that we use here two parameters.
  */
-BENCHMARK_P_F(GentlemanFixture, TryToMarry, 10, 100, (std::size_t flowerTimes, std::size_t dateTimes)) {
-	bool happy = false;
-	if(this->buyFlowers(this->prettyGirl, flowerTimes) &&
-			this->date(this->prettyGirl, dateTimes) &&
-			this->marry(this->prettyGirl)) {
-		// Be happy :-)
-		happy = true;
-	}
+BENCHMARK_P_F(GentlemanFixture, TryToMarry, 10, 100, (std::size_t flowerTimes, std::size_t dateTimes))
+{
+    bool happy = false;
+
+    if ((BuyFlowers(PrettyGirl, flowerTimes)) &&
+        (Date(PrettyGirl, dateTimes)) &&
+        (Marry(PrettyGirl)))
+        // Be happy :-)
+        happy = true;
 }
 
 /*

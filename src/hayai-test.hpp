@@ -2,8 +2,11 @@
 #include <sys/time.h>
 #include <stdint.h>
 
+
 #ifndef __HAYAI_TEST
 #define __HAYAI_TEST
+#include "hayai-testresult.hpp"
+
 namespace Hayai
 {
     /// Base test class.
@@ -38,58 +41,60 @@ namespace Hayai
 
         }
 
-        /// Method is called after test execution finished, provided execution stats.
-        virtual void AfterRun(
-        		double timeRunAverage,
-        		double runsPerSecondAverage, double runsPerSecondMax, double runsPerSecondMin,
-        		double timeIterationAverage, double timeIterationMax, double timeIterationMin,
-        		double iterationsPerSecondAverage, double iterationsPerSecondMax, double iterationsPerSecondMin
-        		)
+
+        /// Post-execution hook.
+
+        /// @param result Benchmark result.
+        virtual void AfterRun(TestResult result)
         {
 
         }
 
-        
+
         /// Run the test.
-        
+
         /// @param iterations Number of iterations to gather data for.
         /// @returns the number of microseconds the run took.
         int64_t Run(std::size_t iterations)
         {
             // Set up the testing fixture.
-            this->SetUp();
-            
+            SetUp();
+
             // Get the starting time.
             struct timeval startTime,
                            endTime;
-            
+
             gettimeofday(&startTime,
                          NULL);
-            
+
             // Run the test body for each iteration.
             std::size_t iteration = iterations;
             while (iteration--)
-                this->TestBody();
-            
+                TestBody();
+
             // Get the ending time.
-            gettimeofday(&endTime,
-                         NULL);
-            
+            gettimeofday(&endTime, NULL);
+
             // Tear down the testing fixture.
-            this->TearDown();
-            
+            TearDown();
+
             // Return the duration in microseconds.
             return (endTime.tv_sec - startTime.tv_sec) * 1000000 + 
                    (endTime.tv_usec - startTime.tv_usec);
         }
-        virtual ~Test() {}
+
+
+        virtual ~Test()
+        {
+
+        }
     protected:
         /// Test body.
-        
+
         /// Executed for each iteration the benchmarking test is run.
         virtual void TestBody()
         {
-            
+
         }
     };
 }
