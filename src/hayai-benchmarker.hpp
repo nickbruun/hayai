@@ -72,14 +72,15 @@ namespace Hayai
         {
             Benchmarker& instance = Instance();
 
+            // Get the tests for execution.
+            std::vector<TestDescriptor*> tests = instance.GetTests();
+
             // Initial output
             std::cout << std::fixed;
             std::cout << Console::TextGreen << "[==========]"
                       << Console::TextDefault << " Running "
-                      << instance._tests.size()
-                      << (instance._tests.size() == 1 ?
-                          " benchmark." : 
-                          " benchmarks.")
+                      << tests.size()
+                      << (tests.size() == 1 ? " benchmark." : " benchmarks.")
                       << std::endl;
 
             // Run through all the tests in ascending order.
@@ -123,13 +124,12 @@ namespace Hayai
                     Console::TextDefault << ")");                       \
             }
 
-            std::size_t index = 0,
-                        testsRun = 0;
+            std::size_t index = 0;
 
-            while (index < instance._tests.size())
+            while (index < tests.size())
             {
                 // Get the test descriptor.
-                TestDescriptor* descriptor = instance._tests[index++];
+                TestDescriptor* descriptor = tests[index++];
 
                 // Check if test matches include filters
                 if (instance._include.size() > 0)
@@ -151,8 +151,6 @@ namespace Hayai
                 	if (!included)
                 		continue;
                 }
-
-                testsRun++;
 
                 // Describe the beginning of the run.
                 std::cout << Console::TextGreen << "[ RUN      ]"
@@ -271,8 +269,8 @@ namespace Hayai
 
             // Final output.
             std::cout << Console::TextGreen << "[==========]"
-                      << Console::TextDefault << " Ran " << testsRun
-                      << (testsRun == 1 ? " benchmark." : " benchmarks.")
+                      << Console::TextDefault << " Ran " << index
+                      << (index == 1 ? " benchmark." : " benchmarks.")
                       << std::endl;
         }
     private:
@@ -290,6 +288,44 @@ namespace Hayai
             std::size_t index = _tests.size();
             while (index--)
                 delete _tests[index];
+        }
+
+
+        /// Get the tests to be executed.
+        std::vector<TestDescriptor*> GetTests() const
+        {
+            std::vector<TestDescriptor*> tests;
+
+            std::size_t index = 0;
+            while (index < _tests.size())
+            {
+                // Get the test descriptor.
+                TestDescriptor* descriptor = _tests[index++];
+
+                // Check if test matches include filters
+                if (!_include.empty())
+                {
+                	bool included = false;
+                	std::string name = descriptor->FixtureName + "." +
+                        descriptor->TestName + descriptor->Parameters;
+
+                	for (std::size_t i = 0; i < _include.size(); i++)
+                    {
+                		if (name.find(_include[i]) != std::string::npos)
+                        {
+                			included = true;
+                			break;
+                		}
+                	}
+
+                	if (!included)
+                		continue;
+                }
+
+                tests.push_back(descriptor);
+            }
+
+            return tests;
         }
 
 
