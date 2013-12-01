@@ -3,6 +3,8 @@
 namespace Hayai
 {
     /// Test result descriptor.
+
+    /// All times are expressed in microseconds.
     struct TestResult
     {
     public:
@@ -22,6 +24,13 @@ namespace Hayai
                 _timeRunMax(timeRunMax)
         {
 
+        }
+
+
+        /// Total time.
+        inline double TimeTotal() const
+        {
+            return _timeTotal;
         }
 
 

@@ -1,3 +1,5 @@
+#ifndef __HAYAI_BENCHMARKER
+#define __HAYAI_BENCHMARKER
 #include <vector>
 #include <iostream>
 #include <limits>
@@ -5,13 +7,11 @@
 #include <string>
 #include <fstream>
 
-#include "hayai-console.hpp"
 #include "hayai-testfactory.hpp"
 #include "hayai-testdescriptor.hpp"
 #include "hayai-testresult.hpp"
+#include "hayai-consoleoutputter.hpp"
 
-#ifndef __HAYAI_BENCHMARKER
-#define __HAYAI_BENCHMARKER
 namespace Hayai
 {
     /// Benchmarking execution controller singleton.
@@ -61,9 +61,19 @@ namespace Hayai
         /// Add an inclusion filter pattern.
 
         /// @param pattern Inclusion pattern.
-        static void AddIncludeFilter(std::string pattern)
+        static void AddIncludeFilter(const std::string& pattern)
         {
         	Instance()._include.push_back(pattern);
+        }
+
+
+        /// Add an outputter.
+
+        /// @param outputter Outputter. The caller must ensure that the
+        /// outputter remains in existence for the entire benchmark run.
+        static void AddOutputter(Outputter& outputter)
+        {
+            Instance()._outputters.push_back(&outputter);
         }
 
 
@@ -71,59 +81,18 @@ namespace Hayai
         static void RunAllTests()
         {
             Benchmarker& instance = Instance();
+            std::vector<Outputter*>& outputters = instance._outputters;
 
             // Get the tests for execution.
             std::vector<TestDescriptor*> tests = instance.GetTests();
 
-            // Initial output
-            std::cout << std::fixed;
-            std::cout << Console::TextGreen << "[==========]"
-                      << Console::TextDefault << " Running "
-                      << tests.size()
-                      << (tests.size() == 1 ? " benchmark." : " benchmarks.")
-                      << std::endl;
+            // Begin output.
+            for (std::size_t outputterIndex = 0;
+                 outputterIndex < outputters.size();
+                 outputterIndex++)
+                outputters[outputterIndex]->Begin(tests.size());
 
             // Run through all the tests in ascending order.
-#define PAD(x) std::cout << std::setw(34) << x << std::endl;
-#define PAD_DEVIATION(description,                                      \
-                      deviated,                                         \
-                      average,                                          \
-                      unit)                                             \
-            {                                                           \
-                double _d_ =                                            \
-                    double(deviated) - double(average);                 \
-                                                                        \
-                PAD(description <<                                      \
-                    deviated << " " << unit << " (" <<                  \
-                    (deviated < average ?                               \
-                     Console::TextRed :                                 \
-                     Console::TextGreen) <<                             \
-                    (deviated > average ? "+" : "") <<                  \
-                    _d_ << " " << unit << " / " <<                      \
-                    (deviated > average ? "+" : "") <<                  \
-                    (_d_ * 100.0 / average) << " %" <<                  \
-                    Console::TextDefault << ")");                       \
-            }
-#define PAD_DEVIATION_INVERSE(description,                              \
-                              deviated,                                 \
-                              average,                                  \
-                              unit)                                     \
-            {                                                           \
-                double _d_ =                                            \
-                    double(deviated) - double(average);                 \
-                                                                        \
-                PAD(description <<                                      \
-                    deviated << " " << unit << " (" <<                  \
-                    (deviated > average ?                               \
-                     Console::TextRed :                                 \
-                     Console::TextGreen) <<                             \
-                    (deviated > average ? "+" : "") <<                  \
-                    _d_ << " " << unit << " / " <<                      \
-                    (deviated > average ? "+" : "") <<                  \
-                    (_d_ * 100.0 / average) << " %" <<                  \
-                    Console::TextDefault << ")");                       \
-            }
-
             std::size_t index = 0;
 
             while (index < tests.size())
@@ -153,19 +122,16 @@ namespace Hayai
                 }
 
                 // Describe the beginning of the run.
-                std::cout << Console::TextGreen << "[ RUN      ]"
-                          << Console::TextYellow << " "
-                          << descriptor->FixtureName << "."
-                          << descriptor->TestName
-                          << descriptor->Parameters
-                          << Console::TextDefault
-                          << " (" << descriptor->Runs
-                          << (descriptor->Runs == 1 ? " run, " : " runs, ") 
-                          << descriptor->Iterations
-                          << (descriptor->Iterations == 1 ?
-                              " iteration per run)" :
-                              " iterations per run)")
-                          << std::endl;
+                for (std::size_t outputterIndex = 0;
+                     outputterIndex < outputters.size();
+                     outputterIndex++)
+                    outputters[outputterIndex]->BeginTest(
+                        descriptor->FixtureName,
+                        descriptor->TestName,
+                        descriptor->Parameters,
+                        descriptor->Runs,
+                        descriptor->Iterations
+                    );
 
                 // Execute each individual run.
                 int64_t timeTotal = 0,
@@ -192,7 +158,7 @@ namespace Hayai
                     delete test;
                 }
 
-                // Calculate different metrics.
+                // Calculate the test result.
                 TestResult testResult(descriptor->Runs,
                                       descriptor->Iterations,
                                       timeTotal,
@@ -200,78 +166,23 @@ namespace Hayai
                                       timeRunMax);
 
                 // Describe the end of the run.
-                std::cout << Console::TextGreen << "[     DONE ]"
-                          << Console::TextYellow << " "
-                          << descriptor->FixtureName << "."
-                          << descriptor->TestName
-                          << descriptor->Parameters
-                          << Console::TextDefault << " ("
-                          << (double(timeTotal) / 1000.0) << " ms)"
-                          << std::endl;
+                for (std::size_t outputterIndex = 0;
+                     outputterIndex < outputters.size();
+                     outputterIndex++)
+                    outputters[outputterIndex]->EndTest(
+                        descriptor->FixtureName,
+                        descriptor->TestName,
+                        descriptor->Parameters,
+                        testResult
+                    );
 
-                std::cout << Console::TextBlue << "[   RUNS   ] "
-                          << Console::TextDefault
-                          << "       Average time: "
-                          << testResult.RunTimeAverage() << " us"
-                          << std::endl;
-
-                PAD_DEVIATION_INVERSE("Fastest: ",
-                                      testResult.RunTimeMinimum(),
-                                      testResult.RunTimeAverage(),
-                                      "us");
-                PAD_DEVIATION_INVERSE("Slowest: ",
-                                      testResult.RunTimeMaximum(),
-                                      testResult.RunTimeAverage(),
-                                      "us");
-                PAD("");
-                PAD("Average performance: " <<
-                    testResult.RunsPerSecondAverage() << " runs/s");
-                PAD_DEVIATION("Best performance: ",
-                              testResult.RunsPerSecondMaximum(),
-                              testResult.RunsPerSecondAverage(),
-                              "runs/s");
-                PAD_DEVIATION("Worst performance: ",
-                              testResult.RunsPerSecondMinimum(),
-                              testResult.RunsPerSecondAverage(),
-                              "runs/s");
-
-                std::cout << Console::TextBlue << "[ITERATIONS] "
-                          << Console::TextDefault
-                          << "       Average time: "
-                          << testResult.IterationTimeAverage() << " us"
-                          << std::endl;
-
-                PAD_DEVIATION_INVERSE("Fastest: ",
-                                      testResult.IterationTimeMinimum(),
-                                      testResult.IterationTimeAverage(),
-                                      "us");
-                PAD_DEVIATION_INVERSE("Slowest: ",
-                                      testResult.IterationTimeMaximum(),
-                                      testResult.IterationTimeAverage(),
-                                      "us");
-                PAD("");
-                PAD("Average performance: " <<
-                    testResult.IterationsPerSecondAverage() <<
-                    " iterations/s");
-                PAD_DEVIATION("Best performance: ",
-                              testResult.IterationsPerSecondMaximum(),
-                              testResult.IterationsPerSecondAverage(),
-                              "iterations/s");
-                PAD_DEVIATION("Worst performance: ",
-                              testResult.IterationsPerSecondMinimum(),
-                              testResult.IterationsPerSecondAverage(),
-                              "iterations/s");
             }
 
-#undef PAD_DEVIATION_INVERSE
-#undef PAD_DEVIATION
-#undef PAD
-
-            // Final output.
-            std::cout << Console::TextGreen << "[==========]"
-                      << Console::TextDefault << " Ran " << index
-                      << (index == 1 ? " benchmark." : " benchmarks.")
-                      << std::endl;
+            // Begin output.
+            for (std::size_t outputterIndex = 0;
+                 outputterIndex < outputters.size();
+                 outputterIndex++)
+                outputters[outputterIndex]->End(tests.size());
         }
     private:
         /// Private constructor.
@@ -329,6 +240,7 @@ namespace Hayai
         }
 
 
+        std::vector<Outputter*> _outputters; ///< Registered outputters.
         std::vector<TestDescriptor*> _tests; ///< Registered tests.
         std::vector<std::string> _include; ///< Test filters.
     };
