@@ -2,7 +2,7 @@
 #define __HAYAI_TEST
 #include <cstddef>
 
-#include "hayai_chrono.hpp"
+#include "hayai_clock.hpp"
 #include "hayai_test_result.hpp"
 
 namespace hayai

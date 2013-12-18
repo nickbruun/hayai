@@ -22,8 +22,8 @@
 // use to obtain the system clock.
 //
 
-#ifndef __HAYAI_CHRONO
-#define __HAYAI_CHRONO
+#ifndef __HAYAI_CLOCK
+#define __HAYAI_CLOCK
 
 #if defined(__APPLE__)
 # include <mach/mach_time.h>
