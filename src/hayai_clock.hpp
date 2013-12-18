@@ -1,6 +1,10 @@
 //
 // System-specific implementation of the clock functions.
 //
+// Copyright (C) 2013 Vlad Lazarenko <vlad@lazarenko.me>
+//
+// Implementaion notes:
+//
 // On Apple (OS X, iOS), mach_absolute_time() is used. It gets
 // CPU/bus dependent real-time clock with up to nanosecond precision.
 //
@@ -22,8 +26,8 @@
 // use to obtain the system clock.
 //
 
-#ifndef __HAYAI_CLOCK
-#define __HAYAI_CLOCK
+#ifndef HAYAI_CLOCK_HPP
+#define HAYAI_CLOCK_HPP
 
 #if defined(__APPLE__)
 # include <mach/mach_time.h>
