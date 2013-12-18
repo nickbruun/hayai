@@ -19,7 +19,11 @@ struct Clock {
     static TimePoint now()
     {
         TimePoint result;
+#ifdef CLOCK_MONOTONIC_RAW
         clock_gettime(CLOCK_MONOTONIC_RAW, &result);
+#else
+        clock_gettime(CLOCK_MONOTONIC, &result);
+#endif
         return result;
     }
 
