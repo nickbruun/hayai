@@ -1,21 +1,20 @@
 #ifndef __HAYAI_TEST
 #define __HAYAI_TEST
 #include <cstddef>
-#include <sys/time.h>
-#include <stdint.h>
 
+#include "hayai_clock.hpp"
 #include "hayai_test_result.hpp"
 
 namespace hayai
 {
     /// Base test class.
-    
-    /// @ref SetUp is invoked before each run, and @ref TearDown is invoked 
-    /// once the run is finished. Iterations rely on the same fixture 
+
+    /// @ref SetUp is invoked before each run, and @ref TearDown is invoked
+    /// once the run is finished. Iterations rely on the same fixture
     /// for every run.
-    /// 
-    /// The default test class does not contain any actual code in the 
-    /// SetUp and TearDown methods, which means that tests can inherit 
+    ///
+    /// The default test class does not contain any actual code in the
+    /// SetUp and TearDown methods, which means that tests can inherit
     /// this class directly for non-fixture based benchmarking tests.
     class Test
     {
@@ -23,15 +22,15 @@ namespace hayai
         /// Set up the testing fixture for execution of a run.
         virtual void SetUp()
         {
-            
+
         }
-        
-        
-        /// Tear down the previously set up testing fixture after the 
+
+
+        /// Tear down the previously set up testing fixture after the
         /// execution run.
         virtual void TearDown()
         {
-            
+
         }
 
 
@@ -45,9 +44,9 @@ namespace hayai
             SetUp();
 
             // Get the starting time.
-            struct timeval startTime, endTime;
+            Clock::TimePoint startTime, endTime;
 
-            gettimeofday(&startTime, NULL);
+            startTime = Clock::now();
 
             // Run the test body for each iteration.
             std::size_t iteration = iterations;
@@ -55,14 +54,13 @@ namespace hayai
                 TestBody();
 
             // Get the ending time.
-            gettimeofday(&endTime, NULL);
+            endTime = Clock::now();
 
             // Tear down the testing fixture.
             TearDown();
 
             // Return the duration in microseconds.
-            return (endTime.tv_sec - startTime.tv_sec) * 1000000 + 
-                   (endTime.tv_usec - startTime.tv_usec);
+            return Clock::diff(startTime, endTime);
         }
 
 
