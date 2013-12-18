@@ -1,7 +1,11 @@
 #ifndef __HAYAI_CHRONO
 #define __HAYAI_CHRONO
 
+#if defined(__APPLE__)
+# include <mach/mach_time.h>
+#else
 #include <sys/time.h>
+#endif
 #include <stdint.h>
 
 namespace hayai
@@ -32,6 +36,24 @@ struct Clock {
             time_diff.tv_nsec = endTime.tv_nsec - startTime.tv_nsec ;
         }
         return time_diff.tv_sec * 1000000 + time_diff.tv_nsec / 1000;
+    }
+};
+
+#elif defined(__APPLE__)
+
+struct Clock {
+    typedef uint64_t TimePoint;
+
+    static TimePoint now()
+    {
+        return mach_absolute_time();
+    }
+
+    static int64_t diff(TimePoint startTime, TimePoint endTime)
+    {
+        mach_timebase_info_data_t time_info;
+        mach_timebase_info(&time_info);
+        return (endTime - startTime) * time_info.numer / time_info.denom / 1000;
     }
 };
 
