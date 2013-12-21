@@ -109,23 +109,28 @@ namespace hayai
                       << testName
                       << parameters
                       << Console::TextDefault << " ("
-                      << (result.TimeTotal() / 1000.0) << " ms)"
+                      << std::setprecision(6)
+                      << (result.TimeTotal() / 1000000.0) << " ms)"
                       << std::endl;
 
             std::cout << Console::TextBlue << "[   RUNS   ] "
                       << Console::TextDefault
                       << "       Average time: "
-                      << result.RunTimeAverage() << " us"
+                      << std::setprecision(3)
+                      << result.RunTimeAverage() / 1000.0 << " us"
                       << std::endl;
 
             PAD_DEVIATION_INVERSE("Fastest: ",
-                                  result.RunTimeMinimum(),
-                                  result.RunTimeAverage(),
+                                  (result.RunTimeMinimum() / 1000.0),
+                                  (result.RunTimeAverage() / 1000.0),
                                   "us");
             PAD_DEVIATION_INVERSE("Slowest: ",
-                                  result.RunTimeMaximum(),
-                                  result.RunTimeAverage(),
+                                  (result.RunTimeMaximum() / 1000.0),
+                                  (result.RunTimeAverage() / 1000.0),
                                   "us");
+
+            std::cout << std::setprecision(5);
+
             PAD("");
             PAD("Average performance: " <<
                 result.RunsPerSecondAverage() << " runs/s");
@@ -140,29 +145,33 @@ namespace hayai
 
             std::cout << Console::TextBlue << "[ITERATIONS] "
                       << Console::TextDefault
+                      << std::setprecision(3)
                       << "       Average time: "
                       << result.IterationTimeAverage() << " us"
                       << std::endl;
 
             PAD_DEVIATION_INVERSE("Fastest: ",
-                                  result.IterationTimeMinimum(),
-                                  result.IterationTimeAverage(),
+                                  result.IterationTimeMinimum() / 1000.0,
+                                  result.IterationTimeAverage() / 1000.0,
                                   "us");
             PAD_DEVIATION_INVERSE("Slowest: ",
-                                  result.IterationTimeMaximum(),
-                                  result.IterationTimeAverage(),
+                                  result.IterationTimeMaximum() / 1000.0,
+                                  result.IterationTimeAverage() / 1000.0,
                                   "us");
+
+            std::cout << std::setprecision(5);
+
             PAD("");
             PAD("Average performance: " <<
                 result.IterationsPerSecondAverage() <<
                 " iterations/s");
             PAD_DEVIATION("Best performance: ",
-                          result.IterationsPerSecondMaximum(),
-                          result.IterationsPerSecondAverage(),
+                          (result.IterationsPerSecondMaximum()),
+                          (result.IterationsPerSecondAverage()),
                           "iterations/s");
             PAD_DEVIATION("Worst performance: ",
-                          result.IterationsPerSecondMinimum(),
-                          result.IterationsPerSecondAverage(),
+                          (result.IterationsPerSecondMinimum()),
+                          (result.IterationsPerSecondAverage()),
                           "iterations/s");
 
 #undef PAD_DEVIATION_INVERSE

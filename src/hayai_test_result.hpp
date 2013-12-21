@@ -4,7 +4,7 @@ namespace hayai
 {
     /// Test result descriptor.
 
-    /// All times are expressed in microseconds.
+    /// All times are expressed in nanoseconds.
     struct TestResult
     {
     public:
@@ -58,21 +58,21 @@ namespace hayai
         /// Average runs per second.
         inline double RunsPerSecondAverage() const
         {
-            return 1000000.0 / RunTimeAverage();
+            return 1000000000.0 / RunTimeAverage();
         }
 
 
         /// Maximum runs per second.
         inline double RunsPerSecondMaximum() const
         {
-            return 1000000.0 / _timeRunMin;
+            return 1000000000.0 / _timeRunMin;
         }
 
 
         /// Minimum runs per second.
         inline double RunsPerSecondMinimum() const
         {
-            return 1000000.0 / _timeRunMax;
+            return 1000000000.0 / _timeRunMax;
         }
 
 
@@ -100,21 +100,21 @@ namespace hayai
         /// Average iterations per second.
         inline double IterationsPerSecondAverage() const
         {
-            return 1000000.0 / IterationTimeAverage();
+            return 1000000000.0 / IterationTimeAverage();
         }
 
 
         /// Minimum iterations per second.
         inline double IterationsPerSecondMinimum() const
         {
-            return 1000000.0 / IterationTimeMaximum();
+            return 1000000000.0 / IterationTimeMaximum();
         }
 
 
         /// Maximum iterations per second.
         inline double IterationsPerSecondMaximum() const
         {
-            return 1000000.0 / IterationTimeMinimum();
+            return 1000000000.0 / IterationTimeMinimum();
         }
     private:
         std::size_t _runs;

@@ -37,7 +37,7 @@ namespace hayai
         /// Run the test.
 
         /// @param iterations Number of iterations to gather data for.
-        /// @returns the number of microseconds the run took.
+        /// @returns the number of nanoseconds the run took.
         int64_t Run(std::size_t iterations)
         {
             // Set up the testing fixture.
@@ -46,7 +46,7 @@ namespace hayai
             // Get the starting time.
             Clock::TimePoint startTime, endTime;
 
-            startTime = Clock::now();
+            startTime = Clock::Now();
 
             // Run the test body for each iteration.
             std::size_t iteration = iterations;
@@ -54,13 +54,13 @@ namespace hayai
                 TestBody();
 
             // Get the ending time.
-            endTime = Clock::now();
+            endTime = Clock::Now();
 
             // Tear down the testing fixture.
             TearDown();
 
-            // Return the duration in microseconds.
-            return Clock::diff(startTime, endTime);
+            // Return the duration in nanoseconds.
+            return Clock::Duration(startTime, endTime);
         }
 
 

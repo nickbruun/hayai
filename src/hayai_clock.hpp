@@ -21,97 +21,137 @@
 // Starting with C++11, we could use std::chrono. However, the details of
 // what clock is really being used is implementation-specific. For example,
 // Visual Studio 2012 defines "high_resolution_clock" as system clock with
-// ~1 millisecond precision that is not acceptable for performance measurements.
-// Therefore, we are much better off having full control of what mechanism we
-// use to obtain the system clock.
+// ~1 millisecond precision that is not acceptable for performance
+// measurements. Therefore, we are much better off having full control of what
+// mechanism we use to obtain the system clock.
 //
-
-#ifndef HAYAI_CLOCK_HPP
-#define HAYAI_CLOCK_HPP
+#ifndef __HAYAI_CLOCK_HPP
+#define __HAYAI_CLOCK_HPP
 
 #if defined(__APPLE__)
-# include <mach/mach_time.h>
+#include <mach/mach_time.h>
 #elif defined(__linux__)
-# include <time.h>
+#include <time.h>
 #else
-# include <sys/time.h>
+#include <sys/time.h>
 #endif
 #include <stdint.h>
 
 namespace hayai
 {
-
 #if defined(__linux__)
-
-struct Clock {
-    typedef struct timespec TimePoint;
-
-    static TimePoint now()
+    struct Clock
     {
-        TimePoint result;
+        /// Time point.
+
+        /// Opaque representation of a point in time.
+        typedef struct timespec TimePoint;
+
+
+        /// Get the current time as a time point.
+
+        /// @returns the current time point.
+        static TimePoint Now()
+        {
+            TimePoint result;
 #ifdef CLOCK_MONOTONIC_RAW
-        clock_gettime(CLOCK_MONOTONIC_RAW, &result);
+            clock_gettime(CLOCK_MONOTONIC_RAW, &result);
 #else
-        clock_gettime(CLOCK_MONOTONIC, &result);
+            clock_gettime(CLOCK_MONOTONIC, &result);
 #endif
-        return result;
-    }
-
-    static int64_t diff(const TimePoint& startTime, const TimePoint& endTime)
-    {
-        TimePoint time_diff;
-        time_diff.tv_sec = endTime.tv_sec - startTime.tv_sec;
-        if (endTime.tv_nsec < startTime.tv_nsec) {
-            time_diff.tv_nsec = (
-                endTime.tv_nsec + 1000000000L - startTime.tv_nsec
-            );
-            time_diff.tv_sec--;
-        } else {
-            time_diff.tv_nsec = endTime.tv_nsec - startTime.tv_nsec ;
+            return result;
         }
-        return time_diff.tv_sec * 1000000 + time_diff.tv_nsec / 1000;
-    }
-};
 
+
+        /// Get the duration between two time points.
+
+        /// @param startTime Start time point.
+        /// @param endTime End time point.
+        /// @returns the number of nanoseconds elapsed between the two time
+        /// points.
+        static int64_t Duration(const TimePoint& startTime,
+                                const TimePoint& endTime)
+        {
+            TimePoint timeDiff;
+
+            timeDiff.tv_sec = endTime.tv_sec - startTime.tv_sec;
+            if (endTime.tv_nsec < startTime.tv_nsec)
+            {
+                timeDiff.tv_nsec = endTime.tv_nsec + 1000000000L - 
+                    startTime.tv_nsec;
+                timeDiff.tv_sec--;
+            }
+            else
+                timeDiff.tv_nsec = endTime.tv_nsec - startTime.tv_nsec;
+
+            return timeDiff.tv_sec * 1000000000 + timeDiff.tv_nsec;
+        }
+    };
 #elif defined(__APPLE__)
-
-struct Clock {
-    typedef uint64_t TimePoint;
-
-    static TimePoint now()
+    struct Clock
     {
-        return mach_absolute_time();
-    }
+        /// Time point.
 
-    static int64_t diff(TimePoint startTime, TimePoint endTime)
-    {
-        mach_timebase_info_data_t time_info;
-        mach_timebase_info(&time_info);
-        return (endTime - startTime) * time_info.numer / time_info.denom / 1000;
-    }
-};
+        /// Opaque representation of a point in time.
+        typedef uint64_t TimePoint;
 
+
+        /// Get the current time as a time point.
+
+        /// @returns the current time point.
+        static TimePoint Now()
+        {
+            return mach_absolute_time();
+        }
+
+
+        /// Get the duration between two time points.
+
+        /// @param startTime Start time point.
+        /// @param endTime End time point.
+        /// @returns the number of nanoseconds elapsed between the two time
+        /// points.
+        static int64_t Duration(const TimePoint& startTime,
+                                const TimePoint& endTime)
+        {
+            mach_timebase_info_data_t time_info;
+            mach_timebase_info(&time_info);
+            return (endTime - startTime) * time_info.numer / time_info.denom;
+        }
+    };
 #else
-
-struct Clock {
-    typedef struct timeval TimePoint;
-
-    static TimePoint now()
+    struct Clock
     {
-        TimePoint result;
-        gettimeofday(&result, NULL);
-        return result;
-    }
+        /// Time point.
 
-    static int64_t diff(const TimePoint& startTime, const TimePoint& endTime)
-    {
-        return ((endTime.tv_sec - startTime.tv_sec) * 1000000 +
-                (endTime.tv_usec - startTime.tv_usec));
-    }
-};
+        /// Opaque representation of a point in time.
+        typedef struct timeval TimePoint;
 
+
+        /// Get the current time as a time point.
+
+        /// @returns the current time point.
+        static TimePoint Now()
+        {
+            TimePoint result;
+            gettimeofday(&result, NULL);
+            return result;
+        }
+
+
+        /// Get the duration between two time points.
+
+        /// @param startTime Start time point.
+        /// @param endTime End time point.
+        /// @returns the number of nanoseconds elapsed between the two time
+        /// points.
+        static int64_t Duration(const TimePoint& startTime,
+                                const TimePoint& endTime)
+        {
+            return ((endTime.tv_sec - startTime.tv_sec) * 1000000000 +
+                    (endTime.tv_usec - startTime.tv_usec) * 1000);
+        }
+    };
 #endif
-
 }
-
 #endif
