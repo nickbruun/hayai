@@ -1,13 +1,12 @@
+#ifndef __HAYAI
+#define __HAYAI
+
 #include "hayai_benchmarker.hpp"
 #include "hayai_test.hpp"
 #include "hayai_default_test_factory.hpp"
 #include "hayai_fixture.hpp"
 #include "hayai_console_outputter.hpp"
 
-#ifndef __HAYAI
-
-#ifndef __HAYAI_
-#define __HAYAI_
 
 #define BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name) \
     fixture_name ## _ ## benchmark_name ## _Benchmark

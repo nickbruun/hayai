@@ -1,3 +1,6 @@
+#ifndef __HAYAI_CONSOLE
+#define __HAYAI_CONSOLE
+
 #include <iostream>
 
 #if defined(_WIN32)
@@ -7,8 +10,7 @@
 #include <windows.h>
 #endif
 
-#ifndef __HAYAI_CONSOLE
-#define __HAYAI_CONSOLE
+
 namespace hayai
 {
     /// Static helper class for outputting to a terminal/console.
