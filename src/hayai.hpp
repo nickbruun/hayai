@@ -6,6 +6,9 @@
 
 #ifndef __HAYAI
 
+#ifndef __HAYAI_
+#define __HAYAI_
+
 #define BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name) \
     fixture_name ## _ ## benchmark_name ## _Benchmark
 
@@ -97,5 +100,6 @@
 
 #define BENCHMARK_P_INSTANCE(fixture_name, benchmark_name, arguments)   \
     BENCHMARK_P_INSTANCE1(fixture_name, benchmark_name, arguments, __COUNTER__)
+
 
 #endif

@@ -2,13 +2,18 @@
 // System-specific implementation of the clock functions.
 //
 // Copyright (C) 2013 Vlad Lazarenko <vlad@lazarenko.me>
+// Copyright (C) 2014 Nicolas Pauss <nicolas.pauss@gmail.com>
 //
-// Implementaion notes:
+// Implementation notes:
+// 
+// On Windows, QueryPerformanceCounter() is used. It gets 
+// real-time clock with up to nanosecond precision.
 //
 // On Apple (OS X, iOS), mach_absolute_time() is used. It gets
 // CPU/bus dependent real-time clock with up to nanosecond precision.
 //
-// On Linux, clock_gettime() is used to access monotonic real-time clock
+// On Unix, gethrtime() is used with HP-UX and Solaris. Otherwise, 
+// clock_gettime() is used to access monotonic real-time clock
 // with up to nanosecond precision. On kernels 2.6.28 and newer, the ticks
 // are also raw and are not subject to NTP and/or adjtime(3) adjustments.
 //
@@ -28,24 +33,51 @@
 #ifndef __HAYAI_CLOCK_HPP
 #define __HAYAI_CLOCK_HPP
 
-#if defined(__APPLE__)
-#include <mach/mach_time.h>
-#elif defined(__linux__)
-#include <time.h>
-#else
-#include <sys/time.h>
+
+// Win32
+#if defined(_WIN32)
+#ifndef NOMINMAX
+#define NOMINMAX
 #endif
+#include <windows.h>
+
+// Apple
+#elif defined(__APPLE__) && defined(__MACH__)
+#include <mach/mach_time.h>
+
+// Unix
+#elif defined(__unix__) || defined(__unix) || defined(unix)
+
+// gethrtime
+#   if (defined(__hpux) || defined(hpux)) || ((defined(__sun__) || defined(__sun) || defined(sun)) && (defined(__SVR4) || defined(__svr4__)))
+#   include <sys/time.h>
+
+// clock_gettime
+#   elif defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0)
+#   include <time.h>
+
+// gettimeofday
+#   else
+#   include <sys/time.h>
+
+#   endif
+#else
+#error "Unable to define high resolution timer for an unknown OS."
+#endif
+
 #include <stdint.h>
 
 namespace hayai
 {
-#if defined(__linux__)
-    struct Clock
+// Win32
+#if defined(_WIN32)
+    class Clock
     {
+    public:
         /// Time point.
 
         /// Opaque representation of a point in time.
-        typedef struct timespec TimePoint;
+        typedef LARGE_INTEGER TimePoint;
 
 
         /// Get the current time as a time point.
@@ -54,11 +86,7 @@ namespace hayai
         static TimePoint Now()
         {
             TimePoint result;
-#ifdef CLOCK_MONOTONIC_RAW
-            clock_gettime(CLOCK_MONOTONIC_RAW, &result);
-#else
-            clock_gettime(CLOCK_MONOTONIC, &result);
-#endif
+            QueryPerformanceCounter(&result);
             return result;
         }
 
@@ -72,24 +100,28 @@ namespace hayai
         static int64_t Duration(const TimePoint& startTime,
                                 const TimePoint& endTime)
         {
-            TimePoint timeDiff;
-
-            timeDiff.tv_sec = endTime.tv_sec - startTime.tv_sec;
-            if (endTime.tv_nsec < startTime.tv_nsec)
-            {
-                timeDiff.tv_nsec = endTime.tv_nsec + 1000000000L - 
-                    startTime.tv_nsec;
-                timeDiff.tv_sec--;
-            }
-            else
-                timeDiff.tv_nsec = endTime.tv_nsec - startTime.tv_nsec;
-
-            return timeDiff.tv_sec * 1000000000 + timeDiff.tv_nsec;
+		    const static double performanceFrequencyNs = 
+		        1e9 / static_cast<double>(PerformanceFrequency());
+		    
+		    return static_cast<int64_t>((endTime.QuadPart - startTime.QuadPart) 
+		        * performanceFrequencyNs);
+        }
+        
+    private:
+        
+        static TimePoint PerformanceFrequency()
+        {
+            TimePoint result;
+            QueryPerformanceFrequency(&result);
+            return result;
         }
     };
-#elif defined(__APPLE__)
-    struct Clock
+
+// Apple    
+#elif defined(__APPLE__) && defined(__MACH__)
+    class Clock
     {
+    public:
         /// Time point.
 
         /// Opaque representation of a point in time.
@@ -119,9 +151,104 @@ namespace hayai
             return (endTime - startTime) * time_info.numer / time_info.denom;
         }
     };
-#else
-    struct Clock
+
+// Unix
+#elif defined(__unix__) || defined(__unix) || defined(unix)
+
+// gethrtime
+#   if (defined(__hpux) || defined(hpux)) || ((defined(__sun__) || defined(__sun) || defined(sun)) && (defined(__SVR4) || defined(__svr4__)))
+    class Clock
     {
+    public:
+        /// Time point.
+
+        /// Opaque representation of a point in time.
+        typedef hrtime_t TimePoint;
+
+
+        /// Get the current time as a time point.
+
+        /// @returns the current time point.
+        static TimePoint Now()
+        {
+            return gethrtime();
+        }
+
+
+        /// Get the duration between two time points.
+
+        /// @param startTime Start time point.
+        /// @param endTime End time point.
+        /// @returns the number of nanoseconds elapsed between the two time
+        /// points.
+        static int64_t Duration(const TimePoint& startTime,
+                                const TimePoint& endTime)
+        {
+            return static_cast<int64_t>(endTime - startTime);
+        }
+    };
+    
+
+// clock_gettime
+#   elif defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0)
+    class Clock
+    {
+    public:
+        /// Time point.
+
+        /// Opaque representation of a point in time.
+        typedef struct timespec TimePoint;
+
+
+        /// Get the current time as a time point.
+
+        /// @returns the current time point.
+        static TimePoint Now()
+        {
+            TimePoint result;
+#       if   defined(CLOCK_MONOTONIC_RAW)
+            clock_gettime(CLOCK_MONOTONIC_RAW, &result);
+#       elif defined(CLOCK_MONOTONIC)
+            clock_gettime(CLOCK_MONOTONIC, &result);
+#       elif defined(CLOCK_REALTIME)
+            clock_gettime(CLOCK_REALTIME, &result);
+#else
+            clock_gettime((clockid_t)-1, &result);
+#endif
+            return result;
+        }
+
+
+        /// Get the duration between two time points.
+
+        /// @param startTime Start time point.
+        /// @param endTime End time point.
+        /// @returns the number of nanoseconds elapsed between the two time
+        /// points.
+        static int64_t Duration(const TimePoint& startTime,
+                                const TimePoint& endTime)
+        {
+            TimePoint timeDiff;
+
+            timeDiff.tv_sec = endTime.tv_sec - startTime.tv_sec;
+            if (endTime.tv_nsec < startTime.tv_nsec)
+            {
+                timeDiff.tv_nsec = endTime.tv_nsec + 1000000000L - 
+                    startTime.tv_nsec;
+                timeDiff.tv_sec--;
+            }
+            else
+                timeDiff.tv_nsec = endTime.tv_nsec - startTime.tv_nsec;
+
+            return timeDiff.tv_sec * 1000000000L + timeDiff.tv_nsec;
+        }
+    };
+  
+// gettimeofday
+#   else
+    class Clock
+    {
+    public:
         /// Time point.
 
         /// Opaque representation of a point in time.
@@ -148,10 +275,11 @@ namespace hayai
         static int64_t Duration(const TimePoint& startTime,
                                 const TimePoint& endTime)
         {
-            return ((endTime.tv_sec - startTime.tv_sec) * 1000000000 +
+            return ((endTime.tv_sec - startTime.tv_sec) * 1000000000L +
                     (endTime.tv_usec - startTime.tv_usec) * 1000);
         }
     };
+#   endif
 #endif
 }
 #endif
