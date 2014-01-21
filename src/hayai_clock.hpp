@@ -100,20 +100,20 @@ namespace hayai
         static int64_t Duration(const TimePoint& startTime,
                                 const TimePoint& endTime)
         {
-		    const static double performanceFrequencyNs = 
-		        1e9 / static_cast<double>(PerformanceFrequency());
+		    const static double performanceFrequencyNs =
+				PerformanceFrequencyNs();
 		    
-		    return static_cast<int64_t>((endTime.QuadPart - startTime.QuadPart) 
+		    return static_cast<int64_t>((endTime.QuadPart - startTime.QuadPart)
 		        * performanceFrequencyNs);
         }
         
     private:
         
-        static TimePoint PerformanceFrequency()
+        static double PerformanceFrequencyNs()
         {
             TimePoint result;
             QueryPerformanceFrequency(&result);
-            return result;
+			return 1e9 / static_cast<double>(result.QuadPart);
         }
     };
 
