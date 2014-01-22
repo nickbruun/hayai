@@ -97,8 +97,14 @@
             new ::hayai::TestFactoryDefault< BENCHMARK_P_CLASS_NAME_(fixture_name, benchmark_name, id) >(), \
             #arguments);
 
+#if defined(__COUNTER__)
+#   define BENCHMARK_P_ID_ __COUNTER__
+#else
+#   define BENCHMARK_P_ID_ __LINE__
+#endif
+
 #define BENCHMARK_P_INSTANCE(fixture_name, benchmark_name, arguments)   \
-    BENCHMARK_P_INSTANCE1(fixture_name, benchmark_name, arguments, __COUNTER__)
+    BENCHMARK_P_INSTANCE1(fixture_name, benchmark_name, arguments, BENCHMARK_P_ID_)
 
 
 #endif
