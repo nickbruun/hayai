@@ -3,6 +3,7 @@
 #include "hayai_default_test_factory.hpp"
 #include "hayai_fixture.hpp"
 #include "hayai_console_outputter.hpp"
+#include "hayai_xml_outputter.hpp"
 
 #ifndef __HAYAI
 
