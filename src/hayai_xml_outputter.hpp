@@ -60,11 +60,11 @@ namespace hayai
         {
             testNode = xmlNewChild(rootNode, NULL, BAD_CAST "hayai::test", NULL);
 
-            AddProperty(testNode, "fixtureName", ToXmlString(fixtureName));
-            AddProperty(testNode, "testName", ToXmlString(testName));
-            AddProperty(testNode, "parameters", ToXmlString(parameters));
-            AddProperty(testNode, "runsCount", ToXmlString(runsCount));
-            AddProperty(testNode, "iterationsCount", ToXmlString(iterationsCount));
+            AddProperty(testNode, "fixtureName", fixtureName);
+            AddProperty(testNode, "testName", testName);
+            AddProperty(testNode, "parameters", parameters);
+            AddProperty(testNode, "runsCount", runsCount);
+            AddProperty(testNode, "iterationsCount", iterationsCount);
         }
 
 
