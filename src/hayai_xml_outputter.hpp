@@ -35,6 +35,12 @@ namespace hayai
             xmlNewProp(node, BAD_CAST name, xmlRepr);
             xmlFree(xmlRepr);
         }
+
+        template <typename NameType>
+        static xmlNodePtr AddChild(xmlNodePtr node, NameType name)
+        {
+            return xmlNewChild(node, NULL, BAD_CAST name, NULL);
+        }
    
     public:
 
@@ -53,12 +59,12 @@ namespace hayai
         }
 
         void BeginTest(const std::string& fixtureName,
-                               const std::string& testName,
-                               const std::string& parameters,
-                               const std::size_t& runsCount,
-                               const std::size_t& iterationsCount)
+                       const std::string& testName,
+                       const std::string& parameters,
+                       const std::size_t& runsCount,
+                       const std::size_t& iterationsCount)
         {
-            testNode = xmlNewChild(rootNode, NULL, BAD_CAST "hayai::test", NULL);
+            testNode = AddChild(rootNode, "hayai::test");
 
             AddProperty(testNode, "fixtureName", fixtureName);
             AddProperty(testNode, "testName", testName);
@@ -69,9 +75,9 @@ namespace hayai
 
 
         void EndTest(const std::string& fixtureName,
-                             const std::string& testName,
-                             const std::string& parameters,
-                             const TestResult& result)
+                     const std::string& testName,
+                     const std::string& parameters,
+                     const TestResult& result)
         {           
             AddProperty(testNode, "timeTotal", result.TimeTotal() / 1000000.0);
             AddProperty(testNode, "runTimeAverage", result.RunTimeAverage() / 1000.0);
