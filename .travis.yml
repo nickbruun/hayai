@@ -2,6 +2,10 @@ language: cpp
 compiler:
   - clang
   - gcc
+before_script:
+  - mkdir install_tmp
 script:
   - cmake .
   - make
+  - DESTDIR=install_tmp make install
+  - valgrind ./sample/sample

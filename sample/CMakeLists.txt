@@ -1,24 +1,20 @@
+# Quench warnings about CMP0003 with CMake 2.4.
+if(COMMAND cmake_policy)
+  cmake_policy(SET CMP0003 NEW)
+endif(COMMAND cmake_policy)
+
 include_directories(
   ${PROJECT_SOURCE_DIR}/src
 )
 
-add_executable(hayai_sample
+add_executable(sample
   delivery_man_benchmark.cpp
   delivery_man_benchmark_with_fixture.cpp
   delivery_man_benchmark_parameterized.cpp
   delivery_man_benchmark_parameterized_with_fixture.cpp
 )
 
-target_link_libraries(hayai_sample
+target_link_libraries(sample
   hayai_main
+  ${LIB_TIMING}
 )
-
-if(UNIX AND NOT APPLE)
-  target_link_libraries(hayai_sample rt)
-endif()
-
-install(TARGETS hayai_sample
-  # IMPORTANT: Add the executable to the "export-set"
-  EXPORT hayai-targets 
-  RUNTIME DESTINATION "${INSTALL_BIN_DIR}"
-  COMPONENT bin)

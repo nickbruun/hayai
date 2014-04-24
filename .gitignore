@@ -9,3 +9,6 @@ Makefile
 cmake_install.cmake
 *.a
 sample/sample
+/hayai-config.cmake
+/hayai-targets.cmake
+/install_manifest.txt
