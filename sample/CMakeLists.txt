@@ -13,6 +13,10 @@ target_link_libraries(hayai_sample
   hayai_main
 )
 
+if(UNIX AND NOT APPLE)
+  target_link_libraries(hayai_sample rt)
+endif()
+
 install(TARGETS hayai_sample
   # IMPORTANT: Add the executable to the "export-set"
   EXPORT hayai-targets 
