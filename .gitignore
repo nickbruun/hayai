@@ -10,5 +10,7 @@ cmake_install.cmake
 *.a
 sample/sample
 
-# Ignore build directory
 /build*
+/hayai-config.cmake
+/hayai-targets.cmake
+/install_manifest.txt

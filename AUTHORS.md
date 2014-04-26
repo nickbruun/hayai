@@ -6,3 +6,4 @@ The following people have contributed to Hayai:
 * Alexander "nevkontakte" <aleks@aradmin.org.ru>
 * Bruno Nery
 * Vlad Lazarenko
+* Mateusz Łoskot <mateusz@loskot.net>
