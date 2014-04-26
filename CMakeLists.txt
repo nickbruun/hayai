@@ -25,11 +25,13 @@ foreach(p LIB BIN INCLUDE CMAKE)
 endforeach()
 
 # Determine system-dependant library paths.
-if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+include(CheckLibraryExists)
+CHECK_LIBRARY_EXISTS(rt clock_gettime "time.h" NEED_RT_LIB)
+if (${NEED_RT_LIB})
   set(LIB_TIMING "rt")
-else (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+else (${NEED_RT_LIB})
   set(LIB_TIMING "")
-endif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+endif (${NEED_RT_LIB})
 
 ##
 # Include the individual projects.

@@ -147,7 +147,7 @@ namespace hayai
                       << Console::TextDefault
                       << std::setprecision(3)
                       << "       Average time: "
-                      << result.IterationTimeAverage() << " us"
+                      << result.IterationTimeAverage() / 1000.0 << " us"
                       << std::endl;
 
             PAD_DEVIATION_INVERSE("Fastest: ",
