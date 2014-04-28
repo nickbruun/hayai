@@ -1,6 +1,5 @@
 #ifndef __HAYAI_CONSOLE
 #define __HAYAI_CONSOLE
-
 #include <iostream>
 
 #if defined(_WIN32)
@@ -44,7 +43,6 @@ namespace hayai
     };
 
 #if defined(_WIN32) && !defined(HAYAI_NO_COLOR) // Windows
-
     inline WORD getConsoleAttributes() {
         CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &consoleInfo);
@@ -89,10 +87,7 @@ namespace hayai
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), newColor);
         return stream;
     }
-
-
 #elif !defined(HAYAI_NO_COLOR) // Linux or others
-
     inline std::ostream& operator <<(std::ostream& stream,
                                      const Console::TextColor& color)
     {
@@ -128,6 +123,5 @@ namespace hayai
         return stream;
     }
 #endif
-
 }
 #endif

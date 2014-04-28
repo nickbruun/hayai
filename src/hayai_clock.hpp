@@ -212,9 +212,9 @@ namespace hayai
             clock_gettime(CLOCK_MONOTONIC, &result);
 #       elif defined(CLOCK_REALTIME)
             clock_gettime(CLOCK_REALTIME, &result);
-#else
+#       else
             clock_gettime((clockid_t)-1, &result);
-#endif
+#       endif
             return result;
         }
 
