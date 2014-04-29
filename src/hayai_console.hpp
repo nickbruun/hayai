@@ -27,31 +27,43 @@ namespace hayai
         {
             /// Default console color. Used for resets.
             TextDefault,
+
             /// Black.
+            ///
             /// @warning Avoid using black unless it is absolutely necesssary.
             TextBlack,
+
             /// Blue.
             TextBlue,
+
             /// Green.
             TextGreen,
+
             /// Cyan.
             TextCyan,
+
             /// Red.
             TextRed,
+
             /// Purple.
             TextPurple,
+
             /// Yellow.
             TextYellow,
+
             /// White.
+            ///
             /// @warning Avoid using white unless it is absolutely necessary.
             TextWhite
         };
     };
 
 #if defined(_WIN32) && !defined(HAYAI_NO_COLOR) // Windows
-    static inline WORD getConsoleAttributes() {
+    static inline WORD getConsoleAttributes()
+    {
         CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
-        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &consoleInfo);
+        GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),
+                                   &consoleInfo);
         return consoleInfo.wAttributes;
     }
 
@@ -61,7 +73,9 @@ namespace hayai
         static const WORD defaultConsoleAttributes =
             getConsoleAttributes();
         WORD newColor;
-        switch(color) {
+
+        switch(color)
+        {
             case Console::TextDefault: 
                 newColor = defaultConsoleAttributes; 
                 break;
@@ -84,10 +98,17 @@ namespace hayai
                 newColor = FOREGROUND_RED | FOREGROUND_BLUE;
                 break;
             case Console::TextYellow: 
-                newColor = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY; 
+                newColor =
+                    FOREGROUND_RED |
+                    FOREGROUND_GREEN |
+                    FOREGROUND_INTENSITY; 
                 break;
             case Console::TextWhite: 
-                newColor = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_INTENSITY; 
+                newColor =
+                    FOREGROUND_RED |
+                    FOREGROUND_GREEN |
+                    FOREGROUND_BLUE |
+                    FOREGROUND_INTENSITY; 
                 break;
         }
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), newColor);
@@ -97,13 +118,11 @@ namespace hayai
     inline std::ostream& operator <<(std::ostream& stream,
                                      const Console::TextColor& color)
     {
-		static const bool outputNoColor = 
-			isatty(fileno(stdout)) != 1;
-			
-		if (outputNoColor) {
+		static const bool outputNoColor = isatty(fileno(stdout)) != 1;
+
+		if (outputNoColor)
 			return stream;
-		}
-		
+
         const char* value;
         switch(color) {
             case Console::TextDefault: 
