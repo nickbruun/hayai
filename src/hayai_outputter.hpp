@@ -40,7 +40,6 @@ namespace hayai
 
         /// End benchmark test run.
 
-
         /// @param fixtureName Fixture name.
         /// @param testName Test name.
         /// @param parameters Test parameter description.
@@ -49,6 +48,12 @@ namespace hayai
                              const std::string& testName,
                              const std::string& parameters,
                              const TestResult& result) = 0;
+
+
+        virtual ~Outputter()
+        {
+
+        }
     };
 }
 #endif

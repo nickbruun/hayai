@@ -148,7 +148,8 @@ namespace hayai
         {
             mach_timebase_info_data_t time_info;
             mach_timebase_info(&time_info);
-            return (endTime - startTime) * time_info.numer / time_info.denom;
+            return int64_t((endTime - startTime) *
+                           time_info.numer / time_info.denom);
         }
     };
 

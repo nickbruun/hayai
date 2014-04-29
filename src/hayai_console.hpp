@@ -143,8 +143,6 @@ namespace hayai
                 value = "\033[0;33m"; break;
             case Console::TextWhite: 
                 value = "\033[0;37m"; break;
-            default:
-                value = "";
         }
         return stream << value;
     }
