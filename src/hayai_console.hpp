@@ -1,12 +1,18 @@
 #ifndef __HAYAI_CONSOLE
 #define __HAYAI_CONSOLE
+
 #include <iostream>
 
-#if defined(_WIN32)
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-#include <windows.h>
+#if !defined(HAYAI_NO_COLOR)
+#	if defined(_WIN32)
+#		ifndef NOMINMAX
+#			define NOMINMAX
+#		endif
+#		include <windows.h>
+#	else
+#		include <unistd.h>
+#		include <cstdio>
+#	endif
 #endif
 
 
@@ -43,7 +49,7 @@ namespace hayai
     };
 
 #if defined(_WIN32) && !defined(HAYAI_NO_COLOR) // Windows
-    inline WORD getConsoleAttributes() {
+    static inline WORD getConsoleAttributes() {
         CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &consoleInfo);
         return consoleInfo.wAttributes;
@@ -91,6 +97,13 @@ namespace hayai
     inline std::ostream& operator <<(std::ostream& stream,
                                      const Console::TextColor& color)
     {
+		static const bool outputNoColor = 
+			isatty(fileno(stdout)) != 1;
+			
+		if (outputNoColor) {
+			return stream;
+		}
+		
         const char* value;
         switch(color) {
             case Console::TextDefault: 
