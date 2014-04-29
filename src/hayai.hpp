@@ -95,7 +95,7 @@
             BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::_runs, \
             BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::_iterations, \
             new ::hayai::TestFactoryDefault< BENCHMARK_P_CLASS_NAME_(fixture_name, benchmark_name, id) >(), \
-            #arguments);
+            #arguments)
 
 #if defined(__COUNTER__)
 #   define BENCHMARK_P_ID_ __COUNTER__
