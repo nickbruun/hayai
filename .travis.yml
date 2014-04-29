@@ -8,7 +8,7 @@ before_install:
 before_script:
   - mkdir install_tmp
 script:
-  - cmake .
+  - ./script/travis-cmake .
   - make
   - DESTDIR=install_tmp make install
   - valgrind --leak-check=full --error-exitcode=1 ./sample/sample

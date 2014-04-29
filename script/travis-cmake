@@ -1,0 +1,11 @@
+#!/bin/sh
+set -ex
+
+if [ "$CXX" = "clang++" ]
+then
+    export CXXFLAGS="-Weverything"
+else
+    export CXXFLAGS="-Wall -pedantic"
+fi
+
+cmake $@
