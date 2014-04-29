@@ -23,19 +23,23 @@
         BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)()           \
         {                                                               \
                                                                         \
-        };                                                              \
+        }                                                               \
     protected:                                                          \
         virtual void TestBody();                                        \
     private:                                                            \
         static const ::hayai::TestDescriptor* _descriptor;              \
     };                                                                  \
                                                                         \
-    const ::hayai::TestDescriptor* BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::_descriptor = \
-        ::hayai::Benchmarker::Instance().RegisterTest(#fixture_name,    \
-                                                      #benchmark_name,  \
-                                                      runs,             \
-                                                      iterations,       \
-                                                      new ::hayai::TestFactoryDefault<BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)>()); \
+    const ::hayai::TestDescriptor*                                      \
+    BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::_descriptor =  \
+        ::hayai::Benchmarker::Instance().RegisterTest(                  \
+            #fixture_name,                                              \
+            #benchmark_name,                                            \
+            runs,                                                       \
+            iterations,                                                 \
+            new ::hayai::TestFactoryDefault<                            \
+                BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)     \
+            >());                                                       \
                                                                         \
     void BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::TestBody()
 
