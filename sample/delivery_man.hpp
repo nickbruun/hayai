@@ -22,7 +22,7 @@ public:
 
 
     /// Initialize a delivery man instance.
-    
+
     /// @param speed Delivery man speed from 1 to 10.
     DeliveryMan(std::size_t speed)
         :   _speed(speed)

@@ -4,15 +4,15 @@
 #include <iostream>
 
 #if !defined(HAYAI_NO_COLOR)
-#	if defined(_WIN32)
-#		ifndef NOMINMAX
-#			define NOMINMAX
-#		endif
-#		include <windows.h>
-#	else
-#		include <unistd.h>
-#		include <cstdio>
-#	endif
+#    if defined(_WIN32)
+#        ifndef NOMINMAX
+#            define NOMINMAX
+#        endif
+#        include <windows.h>
+#    else
+#        include <unistd.h>
+#        include <cstdio>
+#    endif
 #endif
 
 
@@ -76,39 +76,39 @@ namespace hayai
 
         switch(color)
         {
-            case Console::TextDefault: 
-                newColor = defaultConsoleAttributes; 
+            case Console::TextDefault:
+                newColor = defaultConsoleAttributes;
                 break;
-            case Console::TextBlack: 
-                newColor = 0; 
+            case Console::TextBlack:
+                newColor = 0;
                 break;
-            case Console::TextBlue: 
-                newColor = FOREGROUND_BLUE; 
+            case Console::TextBlue:
+                newColor = FOREGROUND_BLUE;
                 break;
-            case Console::TextGreen: 
-                newColor = FOREGROUND_GREEN; 
+            case Console::TextGreen:
+                newColor = FOREGROUND_GREEN;
                 break;
-            case Console::TextCyan: 
-                newColor = FOREGROUND_GREEN | FOREGROUND_BLUE; 
+            case Console::TextCyan:
+                newColor = FOREGROUND_GREEN | FOREGROUND_BLUE;
                 break;
-            case Console::TextRed: 
-                newColor = FOREGROUND_RED; 
+            case Console::TextRed:
+                newColor = FOREGROUND_RED;
                 break;
-            case Console::TextPurple: 
+            case Console::TextPurple:
                 newColor = FOREGROUND_RED | FOREGROUND_BLUE;
                 break;
-            case Console::TextYellow: 
+            case Console::TextYellow:
                 newColor =
                     FOREGROUND_RED |
                     FOREGROUND_GREEN |
-                    FOREGROUND_INTENSITY; 
+                    FOREGROUND_INTENSITY;
                 break;
-            case Console::TextWhite: 
+            case Console::TextWhite:
                 newColor =
                     FOREGROUND_RED |
                     FOREGROUND_GREEN |
                     FOREGROUND_BLUE |
-                    FOREGROUND_INTENSITY; 
+                    FOREGROUND_INTENSITY;
                 break;
         }
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), newColor);
@@ -118,30 +118,30 @@ namespace hayai
     inline std::ostream& operator <<(std::ostream& stream,
                                      const Console::TextColor& color)
     {
-		static const bool outputNoColor = isatty(fileno(stdout)) != 1;
+        static const bool outputNoColor = isatty(fileno(stdout)) != 1;
 
-		if (outputNoColor)
-			return stream;
+        if (outputNoColor)
+            return stream;
 
         const char* value;
         switch(color) {
-            case Console::TextDefault: 
+            case Console::TextDefault:
                 value = "\033[m"; break;
-            case Console::TextBlack: 
+            case Console::TextBlack:
                 value = "\033[0;30m"; break;
-            case Console::TextBlue: 
+            case Console::TextBlue:
                 value = "\033[0;34m"; break;
-            case Console::TextGreen: 
+            case Console::TextGreen:
                 value = "\033[0;32m"; break;
-            case Console::TextCyan: 
+            case Console::TextCyan:
                 value = "\033[0;36m"; break;
-            case Console::TextRed: 
+            case Console::TextRed:
                 value = "\033[0;31m"; break;
-            case Console::TextPurple: 
+            case Console::TextPurple:
                 value = "\033[0;35m"; break;
-            case Console::TextYellow: 
+            case Console::TextYellow:
                 value = "\033[0;33m"; break;
-            case Console::TextWhite: 
+            case Console::TextWhite:
                 value = "\033[0;37m"; break;
         }
         return stream << value;
