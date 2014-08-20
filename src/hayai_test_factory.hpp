@@ -9,16 +9,16 @@ namespace hayai
     {
     public:
         /// Virtual destructor
-        
+
         /// Has no function in the base class.
         virtual ~TestFactory()
         {
-            
+
         }
-        
-        
+
+
         /// Creates a test instance to run.
-        
+
         /// @returns a pointer to an initialized test.
         virtual Test* CreateTest() = 0;
     };

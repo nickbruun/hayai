@@ -20,7 +20,7 @@ namespace hayai
     public:
         /// Get the singleton instance of @ref Benchmarker.
 
-        /// @returns a reference to the singleton instance of the 
+        /// @returns a reference to the singleton instance of the
         /// benchmarker execution controller.
         static Benchmarker& Instance()
         {
@@ -63,7 +63,7 @@ namespace hayai
         /// @param pattern Inclusion pattern.
         static void AddIncludeFilter(const std::string& pattern)
         {
-        	Instance()._include.push_back(pattern);
+            Instance()._include.push_back(pattern);
         }
 
 
@@ -103,22 +103,22 @@ namespace hayai
                 // Check if test matches include filters
                 if (instance._include.size() > 0)
                 {
-                	bool included = false;
-                	std::string name = descriptor->FixtureName + "." +
+                    bool included = false;
+                    std::string name = descriptor->FixtureName + "." +
                         descriptor->TestName + descriptor->Parameters;
 
-                	for (std::size_t i = 0; i <instance._include.size(); i++)
+                    for (std::size_t i = 0; i <instance._include.size(); i++)
                     {
-                		if (name.find(instance._include[i]) !=
+                        if (name.find(instance._include[i]) !=
                             std::string::npos)
                         {
-                			included = true;
-                			break;
-                		}
-                	}
+                            included = true;
+                            break;
+                        }
+                    }
 
-                	if (!included)
-                		continue;
+                    if (!included)
+                        continue;
                 }
 
                 // Describe the beginning of the run.
@@ -216,21 +216,21 @@ namespace hayai
                 // Check if test matches include filters
                 if (!_include.empty())
                 {
-                	bool included = false;
-                	std::string name = descriptor->FixtureName + "." +
+                    bool included = false;
+                    std::string name = descriptor->FixtureName + "." +
                         descriptor->TestName + descriptor->Parameters;
 
-                	for (std::size_t i = 0; i < _include.size(); i++)
+                    for (std::size_t i = 0; i < _include.size(); i++)
                     {
-                		if (name.find(_include[i]) != std::string::npos)
+                        if (name.find(_include[i]) != std::string::npos)
                         {
-                			included = true;
-                			break;
-                		}
-                	}
+                            included = true;
+                            break;
+                        }
+                    }
 
-                	if (!included)
-                		continue;
+                    if (!included)
+                        continue;
                 }
 
                 tests.push_back(descriptor);

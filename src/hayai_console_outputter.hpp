@@ -49,7 +49,7 @@ namespace hayai
                       << parameters
                       << Console::TextDefault
                       << " (" << runsCount
-                      << (runsCount == 1 ? " run, " : " runs, ") 
+                      << (runsCount == 1 ? " run, " : " runs, ")
                       << iterationsCount
                       << (iterationsCount == 1 ?
                           " iteration per run)" :
@@ -102,7 +102,7 @@ namespace hayai
                     (_d_ * 100.0 / average) << " %" <<                  \
                     Console::TextDefault << ")");                       \
             }
-            
+
             std::cout << Console::TextGreen << "[     DONE ]"
                       << Console::TextYellow << " "
                       << fixtureName << "."

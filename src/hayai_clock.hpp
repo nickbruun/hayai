@@ -5,14 +5,14 @@
 // Copyright (C) 2014 Nicolas Pauss <nicolas.pauss@gmail.com>
 //
 // Implementation notes:
-// 
-// On Windows, QueryPerformanceCounter() is used. It gets 
+//
+// On Windows, QueryPerformanceCounter() is used. It gets
 // real-time clock with up to nanosecond precision.
 //
 // On Apple (OS X, iOS), mach_absolute_time() is used. It gets
 // CPU/bus dependent real-time clock with up to nanosecond precision.
 //
-// On Unix, gethrtime() is used with HP-UX and Solaris. Otherwise, 
+// On Unix, gethrtime() is used with HP-UX and Solaris. Otherwise,
 // clock_gettime() is used to access monotonic real-time clock
 // with up to nanosecond precision. On kernels 2.6.28 and newer, the ticks
 // are also raw and are not subject to NTP and/or adjtime(3) adjustments.
@@ -100,24 +100,24 @@ namespace hayai
         static int64_t Duration(const TimePoint& startTime,
                                 const TimePoint& endTime)
         {
-		    const static double performanceFrequencyNs =
-				PerformanceFrequencyNs();
-		    
-		    return static_cast<int64_t>((endTime.QuadPart - startTime.QuadPart)
-		        * performanceFrequencyNs);
+            const static double performanceFrequencyNs =
+                PerformanceFrequencyNs();
+
+            return static_cast<int64_t>((endTime.QuadPart - startTime.QuadPart)
+                * performanceFrequencyNs);
         }
-        
+
     private:
-        
+
         static double PerformanceFrequencyNs()
         {
             TimePoint result;
             QueryPerformanceFrequency(&result);
-			return 1e9 / static_cast<double>(result.QuadPart);
+            return 1e9 / static_cast<double>(result.QuadPart);
         }
     };
 
-// Apple    
+// Apple
 #elif defined(__APPLE__) && defined(__MACH__)
     class Clock
     {
@@ -188,7 +188,7 @@ namespace hayai
             return static_cast<int64_t>(endTime - startTime);
         }
     };
-    
+
 
 // clock_gettime
 #   elif defined(_POSIX_TIMERS) && (_POSIX_TIMERS > 0)
@@ -234,7 +234,7 @@ namespace hayai
             timeDiff.tv_sec = endTime.tv_sec - startTime.tv_sec;
             if (endTime.tv_nsec < startTime.tv_nsec)
             {
-                timeDiff.tv_nsec = endTime.tv_nsec + 1000000000L - 
+                timeDiff.tv_nsec = endTime.tv_nsec + 1000000000L -
                     startTime.tv_nsec;
                 timeDiff.tv_sec--;
             }
@@ -244,7 +244,7 @@ namespace hayai
             return timeDiff.tv_sec * 1000000000L + timeDiff.tv_nsec;
         }
     };
-  
+
 // gettimeofday
 #   else
     class Clock
