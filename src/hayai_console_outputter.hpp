@@ -151,12 +151,12 @@ namespace hayai
                       << std::endl;
 
             PAD_DEVIATION_INVERSE("Fastest: ",
-                                  result.IterationTimeMinimum() / 1000.0,
-                                  result.IterationTimeAverage() / 1000.0,
+                                  (result.IterationTimeMinimum() / 1000.0),
+                                  (result.IterationTimeAverage() / 1000.0),
                                   "us");
             PAD_DEVIATION_INVERSE("Slowest: ",
-                                  result.IterationTimeMaximum() / 1000.0,
-                                  result.IterationTimeAverage() / 1000.0,
+                                  (result.IterationTimeMaximum() / 1000.0),
+                                  (result.IterationTimeAverage() / 1000.0),
                                   "us");
 
             std::cout << std::setprecision(5);
