@@ -23,6 +23,9 @@ namespace hayai
         /// executed.
         virtual void End(const std::size_t& benchmarksCount) = 0;
 
+        /// Show disabled tests count.
+        /// @param disabledCount Number of disabled tests
+        virtual void DisplayDisabledTestsCount(std::size_t disabledCount) = 0;
 
         /// Begin benchmark test run.
 
@@ -48,7 +51,6 @@ namespace hayai
                              const std::string& testName,
                              const std::string& parameters,
                              const TestResult& result) = 0;
-
 
         virtual ~Outputter()
         {

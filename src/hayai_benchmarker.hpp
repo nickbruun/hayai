@@ -187,7 +187,10 @@ namespace hayai
             for (std::size_t outputterIndex = 0;
                  outputterIndex < outputters.size();
                  outputterIndex++)
+            {
                 outputters[outputterIndex]->End(numberOfTests);
+                outputters[outputterIndex]->DisplayDisabledTestsCount(tests.size() - numberOfTests);
+            }
         }
     private:
         /// Private constructor.
