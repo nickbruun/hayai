@@ -123,7 +123,7 @@ namespace hayai
         if (outputNoColor)
             return stream;
 
-        const char* value;
+        const char* value = "";
         switch(color) {
             case Console::TextDefault:
                 value = "\033[m"; break;

@@ -32,7 +32,8 @@ namespace hayai
                 Runs(runs),
                 Iterations(iterations),
                 Factory(testFactory),
-                Parameters(parameters)
+                Parameters(parameters),
+                IsDisabled(false)
         {
 
         }
@@ -67,6 +68,8 @@ namespace hayai
 
         /// Parameters for parametrized tests
         std::string Parameters;
+
+        bool IsDisabled;
     };
 }
 #endif

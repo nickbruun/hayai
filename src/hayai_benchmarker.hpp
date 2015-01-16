@@ -76,10 +76,11 @@ namespace hayai
             Instance()._outputters.push_back(&outputter);
         }
 
-
         /// Run all benchmarking tests.
         static void RunAllTests()
         {
+            std::size_t const numberOfTests = FilterDisabledTests();
+
             Benchmarker& instance = Instance();
             std::vector<Outputter*>& outputters = instance._outputters;
 
@@ -90,7 +91,7 @@ namespace hayai
             for (std::size_t outputterIndex = 0;
                  outputterIndex < outputters.size();
                  outputterIndex++)
-                outputters[outputterIndex]->Begin(tests.size());
+                outputters[outputterIndex]->Begin(numberOfTests);
 
             // Run through all the tests in ascending order.
             std::size_t index = 0;
@@ -100,6 +101,10 @@ namespace hayai
                 // Get the test descriptor.
                 TestDescriptor* descriptor = tests[index++];
 
+                // Check if test is not disabled.
+                if (descriptor->IsDisabled)
+                    continue;
+
                 // Check if test matches include filters
                 if (instance._include.size() > 0)
                 {
@@ -107,7 +112,7 @@ namespace hayai
                     std::string name = descriptor->FixtureName + "." +
                         descriptor->TestName + descriptor->Parameters;
 
-                    for (std::size_t i = 0; i <instance._include.size(); i++)
+                    for (std::size_t i = 0; i < instance._include.size(); i++)
                     {
                         if (name.find(instance._include[i]) !=
                             std::string::npos)
@@ -178,11 +183,14 @@ namespace hayai
 
             }
 
-            // Begin output.
+            // End output.
             for (std::size_t outputterIndex = 0;
                  outputterIndex < outputters.size();
                  outputterIndex++)
-                outputters[outputterIndex]->End(tests.size());
+            {
+                outputters[outputterIndex]->End(numberOfTests);
+                outputters[outputterIndex]->DisplayDisabledTestsCount(tests.size() - numberOfTests);
+            }
         }
     private:
         /// Private constructor.
@@ -239,6 +247,27 @@ namespace hayai
             return tests;
         }
 
+        static std::size_t FilterDisabledTests()
+        {
+            std::vector<TestDescriptor*> tests = Instance().GetTests();
+            std::size_t numberOfTests = tests.size();
+
+            for (std::size_t i = 0; i < tests.size(); ++i)
+            {
+                TestDescriptor* descriptor = tests[i];
+                std::string disabledPrefix("DISABLED_");
+                if (!std::string(descriptor->TestName).compare(
+                            0,
+                            disabledPrefix.size(),
+                            disabledPrefix))
+                {
+                    descriptor->IsDisabled = true;
+                    --numberOfTests;
+                }
+            }
+
+            return numberOfTests;
+        }
 
         std::vector<Outputter*> _outputters; ///< Registered outputters.
         std::vector<TestDescriptor*> _tests; ///< Registered tests.

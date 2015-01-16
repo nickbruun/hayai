@@ -178,6 +178,17 @@ namespace hayai
 #undef PAD_DEVIATION
 #undef PAD
         }
+
+        void DisplayDisabledTestsCount(std::size_t disabledCount)
+        {
+            if (disabledCount)
+            {
+                std::cout << std::endl << Console::TextYellow
+                          << "  YOU HAVE " << disabledCount << " DISABLED "
+                          << (1 == disabledCount ? "TEST" : "TESTS")
+                          << Console::TextDefault << std::endl << std::endl;
+            }
+        }
     };
 }
 #endif
