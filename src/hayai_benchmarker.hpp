@@ -124,23 +124,6 @@ namespace hayai
                 // Get the test descriptor.
                 TestDescriptor* descriptor = tests[index++];
 
-                // Check if test is not disabled.
-                if (descriptor->IsDisabled)
-                {
-                    for (std::size_t outputterIndex = 0;
-                         outputterIndex < outputters.size();
-                         outputterIndex++)
-                        outputters[outputterIndex]->SkipDisabledTest(
-                            descriptor->FixtureName,
-                            descriptor->TestName,
-                            descriptor->Parameters,
-                            descriptor->Runs,
-                            descriptor->Iterations
-                        );
-
-                    continue;
-                }
-
                 // Check if test matches include filters
                 if (instance._include.size() > 0)
                 {
@@ -160,6 +143,23 @@ namespace hayai
 
                     if (!included)
                         continue;
+                }
+
+                // Check if test is not disabled.
+                if (descriptor->IsDisabled)
+                {
+                    for (std::size_t outputterIndex = 0;
+                         outputterIndex < outputters.size();
+                         outputterIndex++)
+                        outputters[outputterIndex]->SkipDisabledTest(
+                            descriptor->FixtureName,
+                            descriptor->TestName,
+                            descriptor->Parameters,
+                            descriptor->Runs,
+                            descriptor->Iterations
+                        );
+
+                    continue;
                 }
 
                 // Describe the beginning of the run.
