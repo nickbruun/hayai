@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <string>
 #include <fstream>
+#include <cstring>
 
 #include "hayai_test_factory.hpp"
 #include "hayai_test_descriptor.hpp"
