@@ -12,38 +12,65 @@ namespace hayai
         :   public Outputter
     {
     public:
-        virtual void Begin(const std::size_t& benchmarksCount)
+        virtual void Begin(const std::size_t& enabledCount,
+                           const std::size_t& disabledCount)
         {
             std::cout << std::fixed;
             std::cout << Console::TextGreen << "[==========]"
                       << Console::TextDefault << " Running "
-                      << benchmarksCount
-                      << (benchmarksCount == 1 ?
+                      << enabledCount
+                      << (enabledCount == 1 ?
                           " benchmark." :
-                          " benchmarks.")
-                      << std::endl;
+                          " benchmarks");
+
+            if (disabledCount)
+                std::cout << ", skipping "
+                          << disabledCount
+                          << (disabledCount == 1 ?
+                              " benchmark." :
+                              " benchmarks");
+            else
+                std::cout << ".";
+
+            std::cout << std::endl;
         }
 
 
-        virtual void End(const std::size_t& benchmarksCount)
+        virtual void End(const std::size_t& executedCount,
+                         const std::size_t& disabledCount)
         {
             std::cout << Console::TextGreen << "[==========]"
-                      << Console::TextDefault << " Ran " << benchmarksCount
-                      << (benchmarksCount == 1 ?
+                      << Console::TextDefault << " Ran " << executedCount
+                      << (executedCount == 1 ?
                           " benchmark." :
-                          " benchmarks.")
-                      << std::endl;
+                          " benchmarks");
+
+            if (disabledCount)
+                std::cout << ", skipped "
+                          << disabledCount
+                          << (disabledCount == 1 ?
+                              " benchmark." :
+                              " benchmarks");
+            else
+                std::cout << ".";
+
+            std::cout << std::endl;
         }
 
 
-        virtual void BeginTest(const std::string& fixtureName,
-                               const std::string& testName,
-                               const std::string& parameters,
-                               const std::size_t& runsCount,
-                               const std::size_t& iterationsCount)
+        inline void BeginOrSkipTest(const std::string& fixtureName,
+                                    const std::string& testName,
+                                    const std::string& parameters,
+                                    const std::size_t& runsCount,
+                                    const std::size_t& iterationsCount,
+                                    const bool skip)
         {
-            std::cout << Console::TextGreen << "[ RUN      ]"
-                      << Console::TextYellow << " "
+            if (skip)
+                std::cout << Console::TextCyan << "[ DISABLED ]";
+            else
+                std::cout << Console::TextGreen << "[ RUN      ]";
+
+            std::cout << Console::TextYellow << " "
                       << fixtureName << "."
                       << testName
                       << parameters
@@ -55,6 +82,36 @@ namespace hayai
                           " iteration per run)" :
                           " iterations per run)")
                       << std::endl;
+        }
+
+
+        virtual void BeginTest(const std::string& fixtureName,
+                               const std::string& testName,
+                               const std::string& parameters,
+                               const std::size_t& runsCount,
+                               const std::size_t& iterationsCount)
+        {
+            BeginOrSkipTest(fixtureName,
+                            testName,
+                            parameters,
+                            runsCount,
+                            iterationsCount,
+                            false);
+        }
+
+
+        virtual void SkipDisabledTest(const std::string& fixtureName,
+                                      const std::string& testName,
+                                      const std::string& parameters,
+                                      const std::size_t& runsCount,
+                                      const std::size_t& iterationsCount)
+        {
+            BeginOrSkipTest(fixtureName,
+                            testName,
+                            parameters,
+                            runsCount,
+                            iterationsCount,
+                            true);
         }
 
 
@@ -177,17 +234,6 @@ namespace hayai
 #undef PAD_DEVIATION_INVERSE
 #undef PAD_DEVIATION
 #undef PAD
-        }
-
-        void DisplayDisabledTestsCount(std::size_t disabledCount)
-        {
-            if (disabledCount)
-            {
-                std::cout << std::endl << Console::TextYellow
-                          << "  YOU HAVE " << disabledCount << " DISABLED "
-                          << (1 == disabledCount ? "TEST" : "TESTS")
-                          << Console::TextDefault << std::endl << std::endl;
-            }
         }
     };
 }

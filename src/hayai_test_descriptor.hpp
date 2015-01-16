@@ -26,14 +26,15 @@ namespace hayai
                        std::size_t runs,
                        std::size_t iterations,
                        TestFactory* testFactory,
-                       std::string parameters = "")
+                       std::string parameters = "",
+                       bool isDisabled = false)
             :   FixtureName(fixtureName),
                 TestName(testName),
                 Runs(runs),
                 Iterations(iterations),
                 Factory(testFactory),
                 Parameters(parameters),
-                IsDisabled(false)
+                IsDisabled(isDisabled)
         {
 
         }
@@ -69,6 +70,8 @@ namespace hayai
         /// Parameters for parametrized tests
         std::string Parameters;
 
+
+        /// Disabled.
         bool IsDisabled;
     };
 }

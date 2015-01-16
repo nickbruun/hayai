@@ -45,12 +45,22 @@ namespace hayai
                                             TestFactory* testFactory,
                                             std::string parameters = "")
         {
+            // Determine if the test has been disabled.
+            static const char* disabledPrefix = "DISABLED_";
+            bool isDisabled = ((::strlen(testName) >= 9) &&
+                               (!::memcmp(testName, disabledPrefix, 9)));
+
+            if (isDisabled)
+                testName += 9;
+
+            // Add the descriptor.
             TestDescriptor* descriptor = new TestDescriptor(fixtureName,
                                                             testName,
                                                             runs,
                                                             iterations,
                                                             testFactory,
-                                                            parameters);
+                                                            parameters,
+                                                            isDisabled);
 
             Instance()._tests.push_back(descriptor);
 
@@ -79,19 +89,32 @@ namespace hayai
         /// Run all benchmarking tests.
         static void RunAllTests()
         {
-            std::size_t const numberOfTests = FilterDisabledTests();
-
             Benchmarker& instance = Instance();
             std::vector<Outputter*>& outputters = instance._outputters;
 
             // Get the tests for execution.
             std::vector<TestDescriptor*> tests = instance.GetTests();
 
+            const std::size_t totalCount = tests.size();
+            std::size_t disabledCount = 0;
+
+            std::vector<TestDescriptor*>::const_iterator testsIt =
+                tests.begin();
+
+            while (testsIt != tests.end())
+            {
+                if ((*testsIt)->IsDisabled)
+                    ++disabledCount;
+                ++testsIt;
+            }
+
+            std::size_t enabledCount = totalCount - disabledCount;
+
             // Begin output.
             for (std::size_t outputterIndex = 0;
                  outputterIndex < outputters.size();
                  outputterIndex++)
-                outputters[outputterIndex]->Begin(numberOfTests);
+                outputters[outputterIndex]->Begin(enabledCount, disabledCount);
 
             // Run through all the tests in ascending order.
             std::size_t index = 0;
@@ -103,7 +126,20 @@ namespace hayai
 
                 // Check if test is not disabled.
                 if (descriptor->IsDisabled)
+                {
+                    for (std::size_t outputterIndex = 0;
+                         outputterIndex < outputters.size();
+                         outputterIndex++)
+                        outputters[outputterIndex]->SkipDisabledTest(
+                            descriptor->FixtureName,
+                            descriptor->TestName,
+                            descriptor->Parameters,
+                            descriptor->Runs,
+                            descriptor->Iterations
+                        );
+
                     continue;
+                }
 
                 // Check if test matches include filters
                 if (instance._include.size() > 0)
@@ -187,10 +223,8 @@ namespace hayai
             for (std::size_t outputterIndex = 0;
                  outputterIndex < outputters.size();
                  outputterIndex++)
-            {
-                outputters[outputterIndex]->End(numberOfTests);
-                outputters[outputterIndex]->DisplayDisabledTestsCount(tests.size() - numberOfTests);
-            }
+                outputters[outputterIndex]->End(enabledCount,
+                                                disabledCount);
         }
     private:
         /// Private constructor.
@@ -245,28 +279,6 @@ namespace hayai
             }
 
             return tests;
-        }
-
-        static std::size_t FilterDisabledTests()
-        {
-            std::vector<TestDescriptor*> tests = Instance().GetTests();
-            std::size_t numberOfTests = tests.size();
-
-            for (std::size_t i = 0; i < tests.size(); ++i)
-            {
-                TestDescriptor* descriptor = tests[i];
-                std::string disabledPrefix("DISABLED_");
-                if (!std::string(descriptor->TestName).compare(
-                            0,
-                            disabledPrefix.size(),
-                            disabledPrefix))
-                {
-                    descriptor->IsDisabled = true;
-                    --numberOfTests;
-                }
-            }
-
-            return numberOfTests;
         }
 
         std::vector<Outputter*> _outputters; ///< Registered outputters.

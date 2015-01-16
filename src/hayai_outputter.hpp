@@ -13,19 +13,23 @@ namespace hayai
     public:
         /// Begin benchmarking.
 
-        /// @param benchmarksCount Number of benchmarks to be executed.
-        virtual void Begin(const std::size_t& benchmarksCount) = 0;
+        /// The total number of benchmarks registred is the sum of the two
+        /// counts passed to the outputter.
+        ///
+        /// @param enabledCount Number of benchmarks to be executed.
+        /// @param disabledCount Number of disabled benchmarks to be skipped.
+        virtual void Begin(const std::size_t& enabledCount,
+                           const std::size_t& disabledCount) = 0;
 
 
         /// End benchmarking.
 
-        /// @param benchmarksCount Number of benchmarks that have been
-        /// executed.
-        virtual void End(const std::size_t& benchmarksCount) = 0;
+        /// @param executedCount Number of benchmarks that have been executed.
+        /// @param disabledCount Number of benchmarks that have been skipped
+        /// because they are disabled.
+        virtual void End(const std::size_t& executedCount,
+                         const std::size_t& disabledCount) = 0;
 
-        /// Show disabled tests count.
-        /// @param disabledCount Number of disabled tests
-        virtual void DisplayDisabledTestsCount(std::size_t disabledCount) = 0;
 
         /// Begin benchmark test run.
 
@@ -51,6 +55,21 @@ namespace hayai
                              const std::string& testName,
                              const std::string& parameters,
                              const TestResult& result) = 0;
+
+
+        /// Skip disabled benchmark test run.
+
+        /// @param fixtureName Fixture name.
+        /// @param testName Test name.
+        /// @param parameters Test parameter description.
+        /// @param runsCount Number of runs to be executed.
+        /// @param iterationsCount Number of iterations per run.
+        virtual void SkipDisabledTest(const std::string& fixtureName,
+                                      const std::string& testName,
+                                      const std::string& parameters,
+                                      const std::size_t& runsCount,
+                                      const std::size_t& iterationsCount) = 0;
+
 
         virtual ~Outputter()
         {
