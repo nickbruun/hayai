@@ -8,3 +8,5 @@ The following people have contributed to Hayai:
 * Vlad Lazarenko
 * Mateusz Łoskot <mateusz@loskot.net>
 * Philipp Fischbeck
+* Sławomir Zborowski
+
