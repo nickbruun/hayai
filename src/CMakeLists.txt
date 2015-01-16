@@ -1,10 +1,16 @@
 file(GLOB hayai_headers
+  hayai.hpp
   hayai_benchmarker.hpp
+  hayai_clock.hpp
   hayai_console.hpp
   hayai_console_outputter.hpp
+  hayai_default_test_factory.hpp
   hayai_fixture.hpp
-  hayai.hpp
   hayai_outputter.hpp
+  hayai_test.hpp
+  hayai_test_descriptor.hpp
+  hayai_test_factory.hpp
+  hayai_test_result.hpp
 )
 
 add_library(hayai_main
