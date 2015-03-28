@@ -12,6 +12,8 @@
 #include "hayai_test_descriptor.hpp"
 #include "hayai_test_result.hpp"
 #include "hayai_console_outputter.hpp"
+#include "hayai_file_outputter.hpp"
+
 
 namespace hayai
 {
