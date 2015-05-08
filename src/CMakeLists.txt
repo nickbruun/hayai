@@ -6,6 +6,7 @@ file(GLOB hayai_headers
   hayai_console_outputter.hpp
   hayai_default_test_factory.hpp
   hayai_fixture.hpp
+  hayai_json_outputter.hpp
   hayai_outputter.hpp
   hayai_test.hpp
   hayai_test_descriptor.hpp

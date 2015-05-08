@@ -3,6 +3,7 @@
 #include <cstddef>
 #include "hayai_test_result.hpp"
 
+
 namespace hayai
 {
     /// Outputter.

@@ -176,12 +176,10 @@ namespace hayai
                     );
 
                 // Execute each individual run.
-                int64_t timeTotal = 0,
-                        timeRunMin = std::numeric_limits<int64_t>::max(),
-                        timeRunMax = std::numeric_limits<int64_t>::min();
+                std::vector<int64_t> runTimes(descriptor->Runs);
 
-                std::size_t run = descriptor->Runs;
-                while (run--)
+                std::size_t run = 0;
+                while (run < descriptor->Runs)
                 {
                     // Construct a test instance.
                     Test* test = descriptor->Factory->CreateTest();
@@ -190,22 +188,17 @@ namespace hayai
                     int64_t time = test->Run(descriptor->Iterations);
 
                     // Store the test time.
-                    timeTotal += time;
-                    if (timeRunMin > time)
-                        timeRunMin = time;
-                    if (timeRunMax < time)
-                        timeRunMax = time;
+                    runTimes[run] = time;
 
                     // Dispose of the test instance.
                     delete test;
+
+                    ++run;
                 }
 
                 // Calculate the test result.
-                TestResult testResult(descriptor->Runs,
-                                      descriptor->Iterations,
-                                      timeTotal,
-                                      timeRunMin,
-                                      timeRunMax);
+                TestResult testResult(runTimes,
+                                      descriptor->Iterations);
 
                 // Describe the end of the run.
                 for (std::size_t outputterIndex = 0;
