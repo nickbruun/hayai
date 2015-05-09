@@ -29,7 +29,11 @@ namespace hayai
     ///     "benchmarks": [{
     ///         "fixture": "DeliveryMan",
     ///         "name": "DeliverPackage",
-    ///         "parameters": "(1, 10)",
+    ///         "parameters": {
+    ///             "type": "std::size_t",
+    ///             "name": "distance",
+    ///             "value": "1"
+    ///         },
     ///         "iterations_per_run": 10,
     ///         "disabled": false,
     ///         "runs": [{
@@ -89,7 +93,7 @@ namespace hayai
 
         virtual void BeginTest(const std::string& fixtureName,
                                const std::string& testName,
-                               const std::string& parameters,
+                               const TestParametersDescriptor& parameters,
                                const std::size_t& runsCount,
                                const std::size_t& iterationsCount)
         {
@@ -104,7 +108,7 @@ namespace hayai
 
         virtual void SkipDisabledTest(const std::string& fixtureName,
                                       const std::string& testName,
-                                      const std::string& parameters,
+                                      const TestParametersDescriptor& parameters,
                                       const std::size_t& runsCount,
                                       const std::size_t& iterationsCount)
         {
@@ -120,7 +124,7 @@ namespace hayai
 
         virtual void EndTest(const std::string& fixtureName,
                              const std::string& testName,
-                             const std::string& parameters,
+                             const TestParametersDescriptor& parameters,
                              const TestResult& result)
         {
             _stream <<
@@ -157,7 +161,7 @@ namespace hayai
     private:
         void BeginTestObject(const std::string& fixtureName,
                              const std::string& testName,
-                             const std::string& parameters,
+                             const TestParametersDescriptor& parameters,
                              const std::size_t& runsCount,
                              const std::size_t& iterationsCount,
                              bool disabled)
@@ -186,13 +190,53 @@ namespace hayai
             _stream <<
                 JSON_VALUE_SEPARATOR;
 
-            if (!parameters.length())
+            const std::vector<TestParameterDescriptor>& descs =
+                parameters.Parameters();
+
+            if (!descs.empty())
             {
                 _stream <<
                     JSON_STRING_BEGIN "parameters" JSON_STRING_END
-                    JSON_NAME_SEPARATOR;
-                WriteString(parameters);
+                    JSON_NAME_SEPARATOR
+                    JSON_ARRAY_BEGIN;
+
+                for (std::size_t i = 0; i < descs.size(); ++i)
+                {
+                    if (i)
+                        _stream << JSON_VALUE_SEPARATOR;
+
+                    const TestParameterDescriptor& desc = descs[i];
+
+                    _stream <<
+                        JSON_OBJECT_BEGIN
+
+                        JSON_STRING_BEGIN "type" JSON_STRING_END
+                        JSON_NAME_SEPARATOR;
+
+                    WriteString(desc.Type);
+
+                    _stream <<
+                        JSON_VALUE_SEPARATOR
+
+                        JSON_STRING_BEGIN "name" JSON_STRING_END
+                        JSON_NAME_SEPARATOR;
+
+                    WriteString(desc.Name);
+
+                    _stream <<
+                        JSON_VALUE_SEPARATOR
+
+                        JSON_STRING_BEGIN "value" JSON_STRING_END
+                        JSON_NAME_SEPARATOR;
+
+                    WriteString(desc.Value);
+
+                    _stream <<
+                        JSON_OBJECT_END;
+                }
+
                 _stream <<
+                    JSON_ARRAY_END
                     JSON_VALUE_SEPARATOR;
             }
 

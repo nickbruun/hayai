@@ -13,6 +13,7 @@
 #include "hayai_test_result.hpp"
 #include "hayai_console_outputter.hpp"
 
+
 namespace hayai
 {
     /// Benchmarking execution controller singleton.
@@ -39,12 +40,14 @@ namespace hayai
         /// @param testFactory Test factory implementation for the test.
         /// @returns a pointer to a @ref TestDescriptor instance
         /// representing the given test.
-        static TestDescriptor* RegisterTest(const char* fixtureName,
-                                            const char* testName,
-                                            std::size_t runs,
-                                            std::size_t iterations,
-                                            TestFactory* testFactory,
-                                            std::string parameters = "")
+        static TestDescriptor* RegisterTest(
+            const char* fixtureName,
+            const char* testName,
+            std::size_t runs,
+            std::size_t iterations,
+            TestFactory* testFactory,
+            TestParametersDescriptor parameters
+        )
         {
             // Determine if the test has been disabled.
             static const char* disabledPrefix = "DISABLED_";
@@ -129,8 +132,9 @@ namespace hayai
                 if (instance._include.size() > 0)
                 {
                     bool included = false;
-                    std::string name = descriptor->FixtureName + "." +
-                        descriptor->TestName + descriptor->Parameters;
+                    std::string name =
+                        descriptor->FixtureName + "." +
+                        descriptor->TestName;
 
                     for (std::size_t i = 0; i < instance._include.size(); i++)
                     {
@@ -197,8 +201,7 @@ namespace hayai
                 }
 
                 // Calculate the test result.
-                TestResult testResult(runTimes,
-                                      descriptor->Iterations);
+                TestResult testResult(runTimes, descriptor->Iterations);
 
                 // Describe the end of the run.
                 for (std::size_t outputterIndex = 0;
@@ -253,8 +256,8 @@ namespace hayai
                 if (!_include.empty())
                 {
                     bool included = false;
-                    std::string name = descriptor->FixtureName + "." +
-                        descriptor->TestName + descriptor->Parameters;
+                    std::string name =
+                        descriptor->FixtureName + "." + descriptor->TestName;
 
                     for (std::size_t i = 0; i < _include.size(); i++)
                     {

@@ -41,7 +41,7 @@ namespace hayai
         /// @param iterationsCount Number of iterations per run.
         virtual void BeginTest(const std::string& fixtureName,
                                const std::string& testName,
-                               const std::string& parameters,
+                               const TestParametersDescriptor& parameters,
                                const std::size_t& runsCount,
                                const std::size_t& iterationsCount) = 0;
 
@@ -54,7 +54,7 @@ namespace hayai
         /// @param result Test result.
         virtual void EndTest(const std::string& fixtureName,
                              const std::string& testName,
-                             const std::string& parameters,
+                             const TestParametersDescriptor& parameters,
                              const TestResult& result) = 0;
 
 
@@ -67,7 +67,8 @@ namespace hayai
         /// @param iterationsCount Number of iterations per run.
         virtual void SkipDisabledTest(const std::string& fixtureName,
                                       const std::string& testName,
-                                      const std::string& parameters,
+                                      const TestParametersDescriptor&
+                                          parameters,
                                       const std::size_t& runsCount,
                                       const std::size_t& iterationsCount) = 0;
 
