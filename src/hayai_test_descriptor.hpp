@@ -222,12 +222,13 @@ namespace hayai
             // Construct the parameter descriptor.
             if (equalPosition)
             {
-                const char* end = raw.c_str() + raw.length();
+                const char* start = raw.c_str();
+                const char* end = start + raw.length();
 
                 return TestParameterDescriptor(
-                    std::string(TrimmedString(position,
-                                              equalPosition)),
-                    std::string(TrimmedString(equalPosition + 1,
+                    std::string(TrimmedString(start,
+                                              equalPosition - 1)),
+                    std::string(TrimmedString(equalPosition,
                                               end))
                 );
             }
