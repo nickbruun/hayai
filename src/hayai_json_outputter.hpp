@@ -30,8 +30,7 @@ namespace hayai
     ///         "fixture": "DeliveryMan",
     ///         "name": "DeliverPackage",
     ///         "parameters": {
-    ///             "type": "std::size_t",
-    ///             "name": "distance",
+    ///             "declaration": "std::size_t distance",
     ///             "value": "1"
     ///         },
     ///         "iterations_per_run": 10,
@@ -210,18 +209,10 @@ namespace hayai
                     _stream <<
                         JSON_OBJECT_BEGIN
 
-                        JSON_STRING_BEGIN "type" JSON_STRING_END
+                        JSON_STRING_BEGIN "declaration" JSON_STRING_END
                         JSON_NAME_SEPARATOR;
 
-                    WriteString(desc.Type);
-
-                    _stream <<
-                        JSON_VALUE_SEPARATOR
-
-                        JSON_STRING_BEGIN "name" JSON_STRING_END
-                        JSON_NAME_SEPARATOR;
-
-                    WriteString(desc.Name);
+                    WriteString(desc.Declaration);
 
                     _stream <<
                         JSON_VALUE_SEPARATOR

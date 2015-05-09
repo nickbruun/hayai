@@ -258,7 +258,7 @@ namespace hayai
                     stream << ", ";
 
                 const TestParameterDescriptor& desc = descs[i];
-                stream << desc.Type << " " << desc.Name << " = " << desc.Value;
+                stream << desc.Declaration << " = " << desc.Value;
             }
 
             stream << ")";

@@ -17,23 +17,17 @@ namespace hayai
     class TestParameterDescriptor
     {
     public:
-        TestParameterDescriptor(std::string type,
-                            std::string name,
-                            std::string value)
-            :   Type(type),
-                Name(name),
+        TestParameterDescriptor(std::string declaration,
+                                std::string value)
+            :   Declaration(declaration),
                 Value(value)
         {
 
         }
 
 
-        /// Type.
-        std::string Type;
-
-
-        /// Name.
-        std::string Name;
+        /// Declaration.
+        std::string Declaration;
 
 
         /// Value.
@@ -166,53 +160,6 @@ namespace hayai
         /// @param position Position.
         std::string ParseType(const char*& position)
         {
-            const char* start = position;
-
-            while (*position)
-            {
-                std::size_t escapeCounter = 0;
-                QuotingState state = Unquoted;
-                bool escaped;
-
-                while (*position)
-                {
-                    const char c = *position++;
-
-                    if (state == Unquoted)
-                    {
-                        if ((c == '"') || (c == '\''))
-                        {
-                            state = (c == '"' ? DoubleQuoted : SingleQuoted);
-                            escaped = false;
-                        }
-                        else if ((c == '<') ||
-                                 (c == '(') ||
-                                 (c == '[') ||
-                                 (c == '{'))
-                            ++escapeCounter;
-                        else if ((escapeCounter) &&
-                                 ((c == '>') ||
-                                  (c == ')') ||
-                                  (c == ']') ||
-                                  (c == '}')))
-                            --escapeCounter;
-                        else if ((!escapeCounter) &&
-                                 (c == ' '))
-                        {
-                            return std::string(start, position - start - 1);
-                        }
-                    }
-                    else
-                    {
-                        if (escaped)
-                            escaped = false;
-                        else if (c == '\\')
-                            escaped = true;
-                        else if (c == (state == DoubleQuoted ? '"' : '\''))
-                            state = Unquoted;
-                    }
-                }
-            }
 
             return std::string();
         }
@@ -225,29 +172,67 @@ namespace hayai
         {
             const char* position = raw.c_str();
 
-            // Parse the type.
-            std::string type = ParseType(position);
+            // Split the declaration into its declaration and its default
+            // type.
+            const char* equalPosition = NULL;
+            std::size_t escapeCounter = 0;
+            QuotingState state = Unquoted;
+            bool escaped;
 
-            // Parse the name and default value.
-            std::string name, defaultValue;
-
-            if (*position)
+            while (*position)
             {
-                const char* equalPosition = strchr(position, '=');
-                const char* end = position + strlen(position);
+                const char c = *position++;
 
-                if (equalPosition)
+                if (state == Unquoted)
                 {
-                    name = std::string(TrimmedString(position,
-                                                     equalPosition));
-                    defaultValue = std::string(TrimmedString(equalPosition + 1,
-                                                             end));
+                    if ((c == '"') || (c == '\''))
+                    {
+                        state = (c == '"' ? DoubleQuoted : SingleQuoted);
+                        escaped = false;
+                    }
+                    else if ((c == '<') ||
+                             (c == '(') ||
+                             (c == '[') ||
+                             (c == '{'))
+                        ++escapeCounter;
+                    else if ((escapeCounter) &&
+                             ((c == '>') ||
+                              (c == ')') ||
+                              (c == ']') ||
+                              (c == '}')))
+                        --escapeCounter;
+                    else if ((!escapeCounter) &&
+                             (c == '='))
+                    {
+                        equalPosition = position;
+                        break;
+                    }
                 }
                 else
-                    name = std::string(TrimmedString(position, end));
+                {
+                    if (escaped)
+                        escaped = false;
+                    else if (c == '\\')
+                        escaped = true;
+                    else if (c == (state == DoubleQuoted ? '"' : '\''))
+                        state = Unquoted;
+                }
             }
 
-            return TestParameterDescriptor(type, name, defaultValue);
+            // Construct the parameter descriptor.
+            if (equalPosition)
+            {
+                const char* end = raw.c_str() + raw.length();
+
+                return TestParameterDescriptor(
+                    std::string(TrimmedString(position,
+                                              equalPosition)),
+                    std::string(TrimmedString(equalPosition + 1,
+                                              end))
+                );
+            }
+            else
+                return TestParameterDescriptor(raw, std::string());
         }
     public:
         TestParametersDescriptor()
@@ -260,8 +245,6 @@ namespace hayai
                                  const char* rawValues)
         {
             // Parse the declarations.
-            std::stringstream ss;
-
             std::vector<std::string> declarations =
                 ParseCommaSeparated(rawDeclarations);
 
@@ -274,11 +257,34 @@ namespace hayai
             // Parse the values.
             std::vector<std::string> values = ParseCommaSeparated(rawValues);
 
-            std::size_t i = 0;
-            while ((i < values.size()) && (i < _parameters.size()))
+            std::size_t
+                straightValues = (_parameters.size() > values.size() ?
+                                  values.size() :
+                                  _parameters.size()),
+                variadicValues = 0;
+
+            if (values.size() > _parameters.size())
             {
+                if (straightValues > 0)
+                    --straightValues;
+                variadicValues = values.size() - _parameters.size() + 1;
+            }
+
+            for (std::size_t i = 0; i < straightValues; ++i)
                 _parameters[i].Value = values[i];
-                ++i;
+
+            if (variadicValues)
+            {
+                std::stringstream variadic;
+
+                for (std::size_t i = 0; i < variadicValues; ++i)
+                {
+                    if (i)
+                        variadic << ", ";
+                    variadic << values[straightValues + i];
+                }
+
+                _parameters[_parameters.size() - 1].Value = variadic.str();
             }
         }
 
