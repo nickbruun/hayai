@@ -47,10 +47,10 @@ add_subdirectory(sample)
 
 # Include tests if requested by the user passing -DTEST=true.
 if (${TEST})
+  enable_testing()
+
   add_subdirectory(vendor/gtest)
   add_subdirectory(tests)
-
-  enable_testing()
 endif (${TEST})
 
 ##
