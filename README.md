@@ -13,3 +13,13 @@ _hayai_ is fully header based, but to use the simple `main` function as describe
     $ make
 
 This will also build the sample available in the `sample/` directory of the repository.
+
+
+## Developing hayai
+
+_hayai_ includes a (currently not at all very comprehensive) test suite for development. To use the test suite, pass a boolean true value as the `TEST` CMake variable:
+
+    $ cd hayai
+    $ cmake -DTEST=true .
+    $ make
+    $ make test

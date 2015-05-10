@@ -3,6 +3,7 @@
 #include "hayai_outputter.hpp"
 #include "hayai_console.hpp"
 
+
 namespace hayai
 {
     /// Console outputter.
@@ -60,7 +61,7 @@ namespace hayai
 
         inline void BeginOrSkipTest(const std::string& fixtureName,
                                     const std::string& testName,
-                                    const std::string& parameters,
+                                    const TestParametersDescriptor& parameters,
                                     const std::size_t& runsCount,
                                     const std::size_t& iterationsCount,
                                     const bool skip)
@@ -70,11 +71,9 @@ namespace hayai
             else
                 std::cout << Console::TextGreen << "[ RUN      ]";
 
-            std::cout << Console::TextYellow << " "
-                      << fixtureName << "."
-                      << testName
-                      << parameters
-                      << Console::TextDefault
+            std::cout << Console::TextYellow << " ";
+            WriteFormattedName(std::cout, fixtureName, testName, parameters);
+            std::cout << Console::TextDefault
                       << " (" << runsCount
                       << (runsCount == 1 ? " run, " : " runs, ")
                       << iterationsCount
@@ -87,7 +86,7 @@ namespace hayai
 
         virtual void BeginTest(const std::string& fixtureName,
                                const std::string& testName,
-                               const std::string& parameters,
+                               const TestParametersDescriptor& parameters,
                                const std::size_t& runsCount,
                                const std::size_t& iterationsCount)
         {
@@ -100,11 +99,13 @@ namespace hayai
         }
 
 
-        virtual void SkipDisabledTest(const std::string& fixtureName,
-                                      const std::string& testName,
-                                      const std::string& parameters,
-                                      const std::size_t& runsCount,
-                                      const std::size_t& iterationsCount)
+        virtual void SkipDisabledTest(
+            const std::string& fixtureName,
+            const std::string& testName,
+            const TestParametersDescriptor& parameters,
+            const std::size_t& runsCount,
+            const std::size_t& iterationsCount
+        )
         {
             BeginOrSkipTest(fixtureName,
                             testName,
@@ -117,7 +118,7 @@ namespace hayai
 
         virtual void EndTest(const std::string& fixtureName,
                              const std::string& testName,
-                             const std::string& parameters,
+                             const TestParametersDescriptor& parameters,
                              const TestResult& result)
         {
 #define PAD(x) std::cout << std::setw(34) << x << std::endl;
@@ -161,11 +162,9 @@ namespace hayai
             }
 
             std::cout << Console::TextGreen << "[     DONE ]"
-                      << Console::TextYellow << " "
-                      << fixtureName << "."
-                      << testName
-                      << parameters
-                      << Console::TextDefault << " ("
+                      << Console::TextYellow << " ";
+            WriteFormattedName(std::cout, fixtureName, testName, parameters);
+            std::cout << Console::TextDefault << " ("
                       << std::setprecision(6)
                       << (result.TimeTotal() / 1000000.0) << " ms)"
                       << std::endl;
@@ -234,6 +233,35 @@ namespace hayai
 #undef PAD_DEVIATION_INVERSE
 #undef PAD_DEVIATION
 #undef PAD
+        }
+    private:
+        inline void WriteFormattedName(
+            std::ostream& stream,
+            const std::string& fixtureName,
+            const std::string& testName,
+            const TestParametersDescriptor& parameters
+        )
+        {
+            stream << fixtureName << "." << testName;
+
+            const std::vector<TestParameterDescriptor>& descs =
+                parameters.Parameters();
+
+            if (descs.empty())
+                return;
+
+            stream << "(";
+
+            for (std::size_t i = 0; i < descs.size(); ++i)
+            {
+                if (i)
+                    stream << ", ";
+
+                const TestParameterDescriptor& desc = descs[i];
+                stream << desc.Declaration << " = " << desc.Value;
+            }
+
+            stream << ")";
         }
     };
 }

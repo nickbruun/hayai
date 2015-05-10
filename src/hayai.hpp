@@ -6,6 +6,7 @@
 #include "hayai_default_test_factory.hpp"
 #include "hayai_fixture.hpp"
 #include "hayai_console_outputter.hpp"
+#include "hayai_json_outputter.hpp"
 
 
 #define BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name) \
@@ -39,7 +40,8 @@
             iterations,                                                 \
             new ::hayai::TestFactoryDefault<                            \
                 BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)     \
-            >());                                                       \
+            >(),                                                        \
+            ::hayai::TestParametersDescriptor());                           \
                                                                         \
     void BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::TestBody()
 
@@ -63,21 +65,37 @@
                runs,                                     \
                iterations)
 
-// Parametrized benchmarks support
-#define BENCHMARK_P_(fixture_name, benchmark_name, fixture_class_name, runs, iterations, arguments) \
-    class BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name): public fixture_class_name { \
+// Parametrized benchmarks.
+#define BENCHMARK_P_(fixture_name,                                      \
+                     benchmark_name,                                    \
+                     fixture_class_name,                                \
+                     runs,                                              \
+                     iterations,                                        \
+                     arguments)                                         \
+    class BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)           \
+        :   public fixture_class_name {                                 \
     public:                                                             \
         BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name) () {}       \
         virtual ~ BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name) () {} \
         static const std::size_t _runs = runs;                          \
         static const std::size_t _iterations = iterations;              \
+        static const char* _argumentsDeclaration() { return #arguments;  } \
     protected:                                                          \
         inline void TestPayload arguments;                              \
     };                                                                  \
     void BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::TestPayload arguments
 
-#define BENCHMARK_P(fixture_name, benchmark_name, runs, iterations, arguments) \
-        BENCHMARK_P_(fixture_name, benchmark_name, hayai::Fixture, runs, iterations, arguments)
+#define BENCHMARK_P(fixture_name,               \
+                    benchmark_name,             \
+                    runs,                       \
+                    iterations,                 \
+                    arguments)                  \
+    BENCHMARK_P_(fixture_name,                  \
+                 benchmark_name,                \
+                 hayai::Fixture,                \
+                 runs,                          \
+                 iterations,                    \
+                 arguments)
 
 #define BENCHMARK_P_F(fixture_name, benchmark_name, runs, iterations, arguments) \
         BENCHMARK_P_(fixture_name, benchmark_name, fixture_name, runs, iterations, arguments)
@@ -99,7 +117,7 @@
             BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::_runs, \
             BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::_iterations, \
             new ::hayai::TestFactoryDefault< BENCHMARK_P_CLASS_NAME_(fixture_name, benchmark_name, id) >(), \
-            #arguments)
+            ::hayai::TestParametersDescriptor(BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::_argumentsDeclaration(), #arguments))
 
 #if defined(__COUNTER__)
 #   define BENCHMARK_P_ID_ __COUNTER__

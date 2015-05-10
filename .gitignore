@@ -7,10 +7,13 @@ CMakeCache.txt
 CMakeFiles
 Makefile
 cmake_install.cmake
+CTestTestfile.cmake
 *.a
 sample/sample
+tests/tests
 
 /build*
 /hayai-config.cmake
 /hayai-targets.cmake
 /install_manifest.txt
+/Testing

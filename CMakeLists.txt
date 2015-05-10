@@ -2,6 +2,7 @@
 # Project setup.
 project(hayai)
 cmake_minimum_required(VERSION 2.4)
+cmake_policy(SET CMP0012 NEW)
 
 # Offer the user the choice of overriding the installation directories.
 set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
@@ -43,6 +44,14 @@ endif (${NEED_RT_LIB})
 # Include the individual projects.
 add_subdirectory(src)
 add_subdirectory(sample)
+
+# Include tests if requested by the user passing -DTEST=true.
+if (${TEST})
+  enable_testing()
+
+  add_subdirectory(vendor/gtest)
+  add_subdirectory(tests)
+endif (${TEST})
 
 ##
 # Export targets and package
