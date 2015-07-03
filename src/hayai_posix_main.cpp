@@ -192,7 +192,8 @@ static void ShowUsage(const char* execName)
               << "    Show this help information." << std::endl
               << std::endl
 
-              << "Using hayai version " << HAYAI_VERSION << std::endl;
+              << "hayai version: " << HAYAI_VERSION << std::endl
+              << "Clock: " << ::hayai::Clock::Description() << std::endl;
 }
 
 
