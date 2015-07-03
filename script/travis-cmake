@@ -3,7 +3,7 @@ set -ex
 
 if [ "$CXX" = "clang++" ]
 then
-    export CXXFLAGS="-Weverything -Wno-weak-vtables -Wno-global-constructors -Wno-exit-time-destructors"
+    export CXXFLAGS="-Weverything -Wno-weak-vtables -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded"
 else
     export CXXFLAGS="-Wall -pedantic"
 fi

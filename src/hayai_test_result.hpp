@@ -19,21 +19,21 @@ namespace hayai
 
         /// @param runTimes Timing for the individual runs.
         /// @param iterations Number of iterations per run.
-        TestResult(const std::vector<int64_t>& runTimes,
+        TestResult(const std::vector<uint64_t>& runTimes,
                    std::size_t iterations)
             :   _runTimes(runTimes),
                 _iterations(iterations),
                 _timeTotal(0),
-                _timeRunMin(std::numeric_limits<int64_t>::max()),
-                _timeRunMax(std::numeric_limits<int64_t>::min())
+                _timeRunMin(std::numeric_limits<uint64_t>::max()),
+                _timeRunMax(std::numeric_limits<uint64_t>::min())
         {
             // Summarize under the assumption of values being accessed more
             // than once.
-            std::vector<int64_t>::iterator runIt = _runTimes.begin();
+            std::vector<uint64_t>::iterator runIt = _runTimes.begin();
 
             while (runIt != _runTimes.end())
             {
-                const int64_t run = *runIt;
+                const uint64_t run = *runIt;
 
                 _timeTotal += run;
                 if ((runIt == _runTimes.begin()) || (run > _timeRunMax))
@@ -54,7 +54,7 @@ namespace hayai
 
 
         /// Run times.
-        inline const std::vector<int64_t>& RunTimes() const
+        inline const std::vector<uint64_t>& RunTimes() const
         {
             return _runTimes;
         }
@@ -143,11 +143,11 @@ namespace hayai
             return 1000000000.0 / IterationTimeMinimum();
         }
     private:
-        std::vector<int64_t> _runTimes;
+        std::vector<uint64_t> _runTimes;
         std::size_t _iterations;
-        int64_t _timeTotal;
-        int64_t _timeRunMin;
-        int64_t _timeRunMax;
+        uint64_t _timeTotal;
+        uint64_t _timeRunMin;
+        uint64_t _timeRunMax;
     };
 }
 #endif

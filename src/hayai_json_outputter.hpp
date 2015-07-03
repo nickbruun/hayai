@@ -66,6 +66,9 @@ namespace hayai
         virtual void Begin(const std::size_t& enabledCount,
                            const std::size_t& disabledCount)
         {
+            (void)enabledCount;
+            (void)disabledCount;
+
             _stream <<
                 JSON_OBJECT_BEGIN
 
@@ -84,6 +87,9 @@ namespace hayai
         virtual void End(const std::size_t& executedCount,
                          const std::size_t& disabledCount)
         {
+            (void)executedCount;
+            (void)disabledCount;
+
             _stream <<
                 JSON_ARRAY_END
                 JSON_OBJECT_END;
@@ -126,6 +132,10 @@ namespace hayai
                              const TestParametersDescriptor& parameters,
                              const TestResult& result)
         {
+            (void)fixtureName;
+            (void)testName;
+            (void)parameters;
+
             _stream <<
                 JSON_VALUE_SEPARATOR
 
@@ -133,9 +143,9 @@ namespace hayai
                 JSON_NAME_SEPARATOR
                 JSON_ARRAY_BEGIN;
 
-            const std::vector<int64_t>& runTimes = result.RunTimes();
+            const std::vector<uint64_t>& runTimes = result.RunTimes();
 
-            for (std::vector<int64_t>::const_iterator it = runTimes.begin();
+            for (std::vector<uint64_t>::const_iterator it = runTimes.begin();
                  it != runTimes.end();
                  ++it)
             {
@@ -146,7 +156,7 @@ namespace hayai
 
                            JSON_STRING_BEGIN "duration" JSON_STRING_END
                            JSON_NAME_SEPARATOR
-                        << std::fixed 
+                        << std::fixed
                         << std::setprecision(6)
                         << (double(*it) / 1000000.0)
                         << JSON_OBJECT_END;
@@ -165,6 +175,8 @@ namespace hayai
                              const std::size_t& iterationsCount,
                              bool disabled)
         {
+            (void)runsCount;
+
             if (_firstTest)
                 _firstTest = false;
             else

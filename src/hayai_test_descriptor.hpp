@@ -86,7 +86,7 @@ namespace hayai
                 --end;
             }
 
-            return std::string(start, end - start);
+            return std::string(start, std::string::size_type(end - start));
         }
 
 
@@ -107,7 +107,7 @@ namespace hayai
                 std::size_t escapeCounter = 0;
                 const char* start = separated;
                 QuotingState state = Unquoted;
-                bool escaped;
+                bool escaped = false;
 
                 while (*separated)
                 {
@@ -155,16 +155,6 @@ namespace hayai
         }
 
 
-        /// Parse parameter type.
-
-        /// @param position Position.
-        std::string ParseType(const char*& position)
-        {
-
-            return std::string();
-        }
-
-
         /// Parse parameter declaration.
 
         /// @param raw Raw declaration.
@@ -177,7 +167,7 @@ namespace hayai
             const char* equalPosition = NULL;
             std::size_t escapeCounter = 0;
             QuotingState state = Unquoted;
-            bool escaped;
+            bool escaped = false;
 
             while (*position)
             {

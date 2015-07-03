@@ -180,7 +180,7 @@ namespace hayai
                     );
 
                 // Execute each individual run.
-                std::vector<int64_t> runTimes(descriptor->Runs);
+                std::vector<uint64_t> runTimes(descriptor->Runs);
 
                 std::size_t run = 0;
                 while (run < descriptor->Runs)
@@ -189,7 +189,7 @@ namespace hayai
                     Test* test = descriptor->Factory->CreateTest();
 
                     // Run the test.
-                    int64_t time = test->Run(descriptor->Iterations);
+                    uint64_t time = test->Run(descriptor->Iterations);
 
                     // Store the test time.
                     runTimes[run] = time;

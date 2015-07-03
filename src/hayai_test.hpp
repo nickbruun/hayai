@@ -38,7 +38,7 @@ namespace hayai
 
         /// @param iterations Number of iterations to gather data for.
         /// @returns the number of nanoseconds the run took.
-        int64_t Run(std::size_t iterations)
+        uint64_t Run(std::size_t iterations)
         {
             // Set up the testing fixture.
             SetUp();
