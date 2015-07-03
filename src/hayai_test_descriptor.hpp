@@ -228,7 +228,7 @@ namespace hayai
     public:
         TestParametersDescriptor()
         {
-        
+
         }
 
 

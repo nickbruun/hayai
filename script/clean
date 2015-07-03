@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BASE_DIR=$(dirname "${SCRIPT_DIR}")
+
+pushd "${BASE_DIR}" > /dev/null
+
+FILES=`find src tests -name '*.cpp' -o -name '*.hpp'`
+
+for FILE in $FILES ; do
+    echo "Cleaning whitespace in $FILE" >&2
+    # Replace tabs with four spaces
+    sed -i "" $'s/\t/    /g' "$FILE"
+    # Strip trailing whitespace
+    sed -i '' -E 's/[[:space:]]*$//' "$FILE"
+done
+
+popd > /dev/null
