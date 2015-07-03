@@ -223,6 +223,20 @@ namespace hayai
                 outputters[outputterIndex]->End(enabledCount,
                                                 disabledCount);
         }
+
+
+        /// List tests.
+        static std::vector<const TestDescriptor*> ListTests()
+        {
+            std::vector<const TestDescriptor*> tests;
+            Benchmarker& instance = Instance();
+
+            std::size_t index = 0;
+            while (index < instance._tests.size())
+                tests.push_back(instance._tests[index++]);
+
+            return tests;
+        }
     private:
         /// Private constructor.
         Benchmarker()
