@@ -4,8 +4,7 @@
 #include <vector>
 #include <set>
 
-#include "hayai.hpp"
-#include "hayai_console.hpp"
+#include "hayai_main.hpp"
 
 
 #if defined(_WIN32)
@@ -27,106 +26,6 @@
         ShowUsage(argv[0]);                                         \
         return EXIT_FAILURE;                                        \
     }
-
-
-/// Execution mode.
-enum ExecutionMode
-{
-    /// Run benchmarks.
-    RunBenchmarks,
-
-
-    /// List benchmarks but do not execute them.
-    ListBenchmarks
-};
-
-
-/// File outputter.
-class FileOutputter
-{
-public:
-    /// File outputter.
-
-    /// @param path Output path. Expected to be available during the life time
-    /// of the outputter.
-    FileOutputter(const char* path)
-        :   _path(path),
-            _outputter(NULL)
-    {
-
-    }
-
-
-    virtual ~FileOutputter()
-    {
-        if (_outputter)
-            delete _outputter;
-
-        _stream.close();
-    }
-
-
-    /// Set up.
-
-    /// Opens the output file for writing and initializes the outputter.
-    virtual void SetUp()
-    {
-        _stream.open(_path,
-                     std::ios_base::out |
-                     std::ios_base::trunc |
-                     std::ios_base::binary);
-        if (_stream.bad())
-        {
-            std::stringstream error;
-            error << "failed to open " << _path << " for writing: "
-                  << strerror(errno);
-            throw std::runtime_error(error.str());
-        }
-
-        _outputter = CreateOutputter(_stream);
-    }
-
-
-    /// Outputter.
-    virtual ::hayai::Outputter& Outputter()
-    {
-        if (!_outputter)
-            throw std::runtime_error("outputter has not been set up");
-
-        return *_outputter;
-    }
-protected:
-    /// Create outputter from output stream.
-
-    /// @param stream Output stream for the outputter.
-    /// @returns the outputter for the given format.
-    virtual ::hayai::Outputter* CreateOutputter(std::ostream& stream) = 0;
-private:
-    const char* _path;
-    std::ofstream _stream;
-    ::hayai::Outputter* _outputter;
-};
-
-
-class JsonFileOutputter
-    :   public FileOutputter
-{
-public:
-    /// JSON file outputter.
-
-    /// @param path Output path. Expected to be available during the life time
-    /// of the outputter.
-    JsonFileOutputter(const char* path)
-        :   FileOutputter(path)
-    {
-
-    }
-protected:
-    virtual ::hayai::Outputter* CreateOutputter(std::ostream& stream)
-    {
-        return new ::hayai::JsonOutputter(stream);
-    }
-};
 
 
 /// Show usage.
@@ -200,9 +99,9 @@ static void ShowUsage(const char* execName)
 int main(int argc, char** argv)
 {
     // Set up defaults.
-    ExecutionMode execMode = RunBenchmarks;
+    ::hayai::MainExecutionMode execMode = ::hayai::MainRunBenchmarks;
     bool shuffle = false;
-    std::vector<FileOutputter*> fileOutputters;
+    std::vector< ::hayai::FileOutputter*> fileOutputters;
     ::hayai::Outputter* stdoutOutputter = NULL;
 
     // Parse the arguments.
@@ -218,7 +117,7 @@ int main(int argc, char** argv)
 
         // List flag.
         if ((!strcmp(arg, "-l")) || (!strcmp(arg, "--list")))
-            execMode = ListBenchmarks;
+            execMode = ::hayai::MainListBenchmarks;
         // Shuffle flag.
         else if ((!strcmp(arg, "-s")) || (!strcmp(arg, "--shuffle")))
             shuffle = true;
@@ -254,7 +153,9 @@ int main(int argc, char** argv)
             else if (!strcmp(format, "json"))
             {
                 if (path)
-                    fileOutputters.push_back(new JsonFileOutputter(path));
+                    fileOutputters.push_back(
+                        new ::hayai::JsonFileOutputter(path)
+                    );
                 else
                 {
                     if (stdoutOutputter)
@@ -303,7 +204,7 @@ int main(int argc, char** argv)
     // Execute based on the selected mode.
     switch (execMode)
     {
-    case RunBenchmarks:
+    case ::hayai::MainRunBenchmarks:
     {
         // Ensure that at least one output exists.
         if ((!stdoutOutputter) && (fileOutputters.empty()))
@@ -313,11 +214,12 @@ int main(int argc, char** argv)
         if (stdoutOutputter)
             ::hayai::Benchmarker::AddOutputter(*stdoutOutputter);
 
-        for (std::vector<FileOutputter*>::iterator it = fileOutputters.begin();
+        for (std::vector< ::hayai::FileOutputter*>::iterator it =
+                 fileOutputters.begin();
              it < fileOutputters.end();
              ++it)
         {
-            FileOutputter& fileOutputter = **it;
+            ::hayai::FileOutputter& fileOutputter = **it;
 
             try
             {
@@ -340,7 +242,7 @@ int main(int argc, char** argv)
         break;
     }
 
-    case ListBenchmarks:
+    case ::hayai::MainListBenchmarks:
     {
         // List out the unique benchmark names.
         std::vector<const ::hayai::TestDescriptor*> tests =
@@ -378,12 +280,14 @@ int main(int argc, char** argv)
     }
 
     // Clean up the outputs.
-    for (std::vector<FileOutputter*>::iterator it = fileOutputters.begin();
+    for (std::vector< ::hayai::FileOutputter*>::iterator it =
+             fileOutputters.begin();
          it < fileOutputters.end();
          ++it)
         delete *it;
 
-    delete stdoutOutputter;
+    if (stdoutOutputter)
+        delete stdoutOutputter;
 
     return EXIT_SUCCESS;
 }
