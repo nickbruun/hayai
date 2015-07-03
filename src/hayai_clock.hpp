@@ -36,8 +36,11 @@
 // nanosecond precision of unsigned 64-bit integers would require an uptime of
 // almost 585 years for this to happen. Let's call ourselves safe on that one.
 //
-#ifndef __HAYAI_CLOCK_HPP
-#define __HAYAI_CLOCK_HPP
+#ifndef __HAYAI_CLOCK
+#define __HAYAI_CLOCK
+
+#include "hayai_compatibility.hpp"
+
 
 // Win32
 #if defined(_WIN32)
@@ -139,7 +142,7 @@ namespace hayai
         /// Get the current time as a time point.
 
         /// @returns the current time point.
-        static TimePoint Now()
+        static TimePoint Now() __hayai_noexcept
         {
             return mach_absolute_time();
         }
@@ -152,7 +155,7 @@ namespace hayai
         /// @returns the number of nanoseconds elapsed between the two time
         /// points.
         static uint64_t Duration(const TimePoint& startTime,
-                                const TimePoint& endTime)
+                                 const TimePoint& endTime) __hayai_noexcept
         {            
             mach_timebase_info_data_t time_info;
             mach_timebase_info(&time_info);
@@ -178,7 +181,7 @@ namespace hayai
         /// Get the current time as a time point.
 
         /// @returns the current time point.
-        static TimePoint Now()
+        static TimePoint Now() __hayai_noexcept
         {
             return gethrtime();
         }
@@ -191,7 +194,7 @@ namespace hayai
         /// @returns the number of nanoseconds elapsed between the two time
         /// points.
         static uint64_t Duration(const TimePoint& startTime,
-                                 const TimePoint& endTime)
+                                 const TimePoint& endTime) __hayai_noexcept
         {
             return static_cast<uint64_t>(endTime - startTime);
         }
@@ -212,7 +215,7 @@ namespace hayai
         /// Get the current time as a time point.
 
         /// @returns the current time point.
-        static TimePoint Now()
+        static TimePoint Now() __hayai_noexcept
         {
             TimePoint result;
 #       if   defined(CLOCK_MONOTONIC_RAW)
@@ -235,7 +238,7 @@ namespace hayai
         /// @returns the number of nanoseconds elapsed between the two time
         /// points.
         static uint64_t Duration(const TimePoint& startTime,
-                                const TimePoint& endTime)
+                                 const TimePoint& endTime) __hayai_noexcept
         {
             TimePoint timeDiff;
 
@@ -268,7 +271,7 @@ namespace hayai
         /// Get the current time as a time point.
 
         /// @returns the current time point.
-        static TimePoint Now()
+        static TimePoint Now() __hayai_noexcept
         {
             TimePoint result;
             gettimeofday(&result, NULL);
@@ -283,7 +286,7 @@ namespace hayai
         /// @returns the number of nanoseconds elapsed between the two time
         /// points.
         static uint64_t Duration(const TimePoint& startTime,
-                                 const TimePoint& endTime)
+                                 const TimePoint& endTime) __hayai_noexcept
         {
             TimePoint timeDiff;
 
