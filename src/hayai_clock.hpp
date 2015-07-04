@@ -119,6 +119,14 @@ namespace hayai
             );
         }
 
+
+        /// Clock implementation description.
+
+        /// @returns a description of the clock implementation used.
+        static const char* Description()
+        {
+            return "QueryPerformanceCounter";
+        }
     private:
         static double PerformanceFrequencyNs()
         {
@@ -156,11 +164,20 @@ namespace hayai
         /// points.
         static uint64_t Duration(const TimePoint& startTime,
                                  const TimePoint& endTime) __hayai_noexcept
-        {            
+        {
             mach_timebase_info_data_t time_info;
             mach_timebase_info(&time_info);
 
             return (endTime - startTime) * time_info.numer / time_info.denom;
+        }
+
+
+        /// Clock implementation description.
+
+        /// @returns a description of the clock implementation used.
+        static const char* Description()
+        {
+            return "mach_absolute_time";
         }
     };
 
@@ -197,6 +214,15 @@ namespace hayai
                                  const TimePoint& endTime) __hayai_noexcept
         {
             return static_cast<uint64_t>(endTime - startTime);
+        }
+
+
+        /// Clock implementation description.
+
+        /// @returns a description of the clock implementation used.
+        static const char* Description()
+        {
+            return "gethrtime";
         }
     };
 
@@ -255,6 +281,23 @@ namespace hayai
             return static_cast<uint64_t>(timeDiff.tv_sec * 1000000000L +
                                          timeDiff.tv_nsec);
         }
+
+
+        /// Clock implementation description.
+
+        /// @returns a description of the clock implementation used.
+        static const char* Description()
+        {
+#       if   defined(CLOCK_MONOTONIC_RAW)
+            return "clock_gettime(CLOCK_MONOTONIC_RAW)";
+#       elif defined(CLOCK_MONOTONIC)
+            return "clock_gettime(CLOCK_MONOTONIC)";
+#       elif defined(CLOCK_REALTIME)
+            return "clock_gettime(CLOCK_REALTIME)";
+#       else
+            return "clock_gettime(-1)";
+#       endif
+        }
     };
 
 // gettimeofday
@@ -302,6 +345,15 @@ namespace hayai
 
             return static_cast<uint64_t>(timeDiff.tv_sec * 1000000000L +
                                          timeDiff.tv_usec * 1000);
+        }
+
+
+        /// Clock implementation description.
+
+        /// @returns a description of the clock implementation used.
+        static const char* Description()
+        {
+            return "gettimeofday";
         }
     };
 #   endif

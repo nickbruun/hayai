@@ -9,6 +9,9 @@
 #include "hayai_json_outputter.hpp"
 
 
+#define HAYAI_VERSION "1.0.0-pre"
+
+
 #define BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name) \
     fixture_name ## _ ## benchmark_name ## _Benchmark
 

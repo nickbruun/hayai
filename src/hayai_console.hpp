@@ -56,10 +56,44 @@ namespace hayai
             /// @warning Avoid using white unless it is absolutely necessary.
             TextWhite
         };
+
+
+        /// Get the singleton instance of @ref Console.
+
+        /// @returns a reference to the singleton instance of the
+        /// benchmarker execution controller.
+        inline static Console& Instance()
+        {
+            static Console singleton;
+            return singleton;
+        }
+
+
+        /// Test if formatting is enabled.
+        inline static bool IsFormattingEnabled()
+        {
+            return Instance()._formattingEnabled;
+        }
+
+
+        /// Set whether formatting is enabled.
+        inline static void SetFormattingEnabled(bool enabled)
+        {
+            Instance()._formattingEnabled = enabled;
+        }
+    private:
+        inline Console()
+            :   _formattingEnabled(true)
+        {
+
+        }
+
+
+        bool _formattingEnabled;
     };
 
 #if defined(_WIN32) && !defined(HAYAI_NO_COLOR) // Windows
-    static inline WORD getConsoleAttributes()
+    static inline WORD GetConsoleAttributes()
     {
         CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),
@@ -71,8 +105,13 @@ namespace hayai
                                      const Console::TextColor& color)
     {
         static const WORD defaultConsoleAttributes =
-            getConsoleAttributes();
+            GetConsoleAttributes();
         WORD newColor;
+
+        if ((!Console::IsFormattingEnabled()) ||
+            ((stream.rdbuf() != std::cout.rdbuf()) &&
+             (stream.rdbuf() != std::cerr.rdbuf())))
+            return stream;
 
         switch(color)
         {
@@ -120,7 +159,10 @@ namespace hayai
     {
         static const bool outputNoColor = isatty(fileno(stdout)) != 1;
 
-        if (outputNoColor)
+        if ((!Console::IsFormattingEnabled()) ||
+            (outputNoColor) ||
+            ((stream.rdbuf() != std::cout.rdbuf()) &&
+             (stream.rdbuf() != std::cerr.rdbuf())))
             return stream;
 
         const char* value = "";
