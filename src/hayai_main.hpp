@@ -105,5 +105,25 @@ namespace hayai
         }
     };
 
+
+    class ConsoleFileOutputter
+        :   public FileOutputter
+    {
+    public:
+        /// Console file outputter.
+
+        /// @param path Output path. Expected to be available during the life
+        /// time of the outputter.
+        ConsoleFileOutputter(const char* path)
+            :   FileOutputter(path)
+        {
+
+        }
+    protected:
+        virtual ::hayai::Outputter* CreateOutputter(std::ostream& stream)
+        {
+            return new ::hayai::ConsoleOutputter(stream);
+        }
+    };
 }
 #endif

@@ -59,7 +59,7 @@ namespace hayai
     };
 
 #if defined(_WIN32) && !defined(HAYAI_NO_COLOR) // Windows
-    static inline WORD getConsoleAttributes()
+    static inline WORD GetConsoleAttributes()
     {
         CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
         GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),
@@ -71,7 +71,7 @@ namespace hayai
                                      const Console::TextColor& color)
     {
         static const WORD defaultConsoleAttributes =
-            getConsoleAttributes();
+            GetConsoleAttributes();
         WORD newColor;
 
         switch(color)
@@ -120,7 +120,9 @@ namespace hayai
     {
         static const bool outputNoColor = isatty(fileno(stdout)) != 1;
 
-        if (outputNoColor)
+        if ((outputNoColor) ||
+            ((stream.rdbuf() != std::cout.rdbuf()) &&
+             (stream.rdbuf() != std::cerr.rdbuf())))
             return stream;
 
         const char* value = "";

@@ -14,15 +14,16 @@
 #endif
 
 
-#define Flag(_desc)                                                \
+#define FORMAT_FLAG(_desc)                                              \
     ::hayai::Console::TextGreen << _desc << ::hayai::Console::TextDefault
-#define Argument(_desc)                                                 \
+#define FORMAT_ARGUMENT(_desc)                                          \
     ::hayai::Console::TextYellow << _desc << ::hayai::Console::TextDefault
-#define UsageError(_desc)                                           \
+#define FORMAT_ERROR(_desc)                                             \
+    ::hayai::Console::TextRed << "Error:" <<                            \
+    ::hayai::Console::TextDefault << ": " << _desc
+#define USAGE_ERROR(_desc)                                          \
     {                                                               \
-        std::cerr << ::hayai::Console::TextRed << "Error"           \
-                  << ::hayai::Console::TextDefault << ": " << _desc \
-                  << std::endl << std::endl;                        \
+        std::cerr << FORMAT_ERROR(_desc) << std::endl << std::endl; \
         ShowUsage(argv[0]);                                         \
         return EXIT_FAILURE;                                        \
     }
@@ -36,29 +37,32 @@ static void ShowUsage(const char* execName)
     const char* baseName = strrchr(execName, PATH_SEPARATOR);
 
     std::cerr << "Usage: " << (baseName ? baseName + 1 : execName)
-              << " " << Flag("[OPTIONS]") << std::endl
+              << " " << FORMAT_FLAG("[OPTIONS]") << std::endl
               << std::endl
 
               << "  Runs the benchmarks for this project." << std::endl
               << std::endl
 
               << "Benchmark selection options:" << std::endl
-              << "  " << Flag("-l") << ", " << Flag("--list") << std::endl
+              << "  " << FORMAT_FLAG("-l") << ", " << FORMAT_FLAG("--list")
+              << std::endl
               << "    List the names of all benchmarks instead of "
               << "running them." << std::endl
-              << "  " << Flag("-f") << ", " << Flag("--filter") << " <"
-              << Argument("pattern") << ">" << std::endl
+              << "  " << FORMAT_FLAG("-f") << ", " << FORMAT_FLAG("--filter")
+              << " <" << FORMAT_ARGUMENT("pattern") << ">" << std::endl
               << "    Run only tests that match a given pattern." << std::endl
               << std::endl
 
               << "Benchmark execution options:" << std::endl
-              << "  " << Flag("-s") << ", " << Flag("--shuffle") << std::endl
+              << "  " << FORMAT_FLAG("-s") << ", " << FORMAT_FLAG("--shuffle")
+              << std::endl
               << "    Randomize benchmark execution order." << std::endl
               << std::endl
 
               << "Benchmark output options:" << std::endl
-              << "  " << Flag("-o") << ", " << Flag("--output") << " <"
-              << Argument("format") << ">[:" << Argument("<path>") << "]"
+              << "  " << FORMAT_FLAG("-o") << ", " << FORMAT_FLAG("--output")
+              << " <" << FORMAT_ARGUMENT("format") << ">[:"
+              << FORMAT_ARGUMENT("<path>") << "]"
               << std::endl
               << "    Output results in a specific format. If no path is "
               << "specified, the output" << std::endl
@@ -67,15 +71,16 @@ static void ShowUsage(const char* execName)
               << "    in different formats. The supported formats are:"
               << std::endl
               << std::endl
-              << "    " << Argument("console") << std::endl
+              << "    " << FORMAT_ARGUMENT("console") << std::endl
               << "      Standard console output." << std::endl
-              << "    " << Argument("json") << std::endl
+              << "    " << FORMAT_ARGUMENT("json") << std::endl
               << "      JSON." << std::endl
               << std::endl
               << "    If multiple output formats are provided without a "
               << "path, only the last" << std::endl
               << "    provided format will be output to stdout." << std::endl
-              << "  " << Flag("--c") << ", " << Flag("--color") << " ("
+              << "  " << FORMAT_FLAG("--c") << ", "
+              << FORMAT_FLAG("--color") << " ("
               << ::hayai::Console::TextGreen << "yes"
               << ::hayai::Console::TextDefault << "|"
               << ::hayai::Console::TextGreen << "no"
@@ -86,13 +91,14 @@ static void ShowUsage(const char* execName)
               << std::endl
 
               << "Miscellaneous options:" << std::endl
-              << "  " << Flag("-?") << ", " << Flag("-h") << ", "
-              << Flag("--help") << std::endl
+              << "  " << FORMAT_FLAG("-?") << ", " << FORMAT_FLAG("-h") << ", "
+              << FORMAT_FLAG("--help") << std::endl
               << "    Show this help information." << std::endl
               << std::endl
 
               << "hayai version: " << HAYAI_VERSION << std::endl
-              << "Clock: " << ::hayai::Clock::Description() << std::endl;
+              << "Clock implementation: " << ::hayai::Clock::Description()
+              << std::endl;
 }
 
 
@@ -125,7 +131,8 @@ int main(int argc, char** argv)
         else if ((!strcmp(arg, "-o")) || (!strcmp(arg, "--output")))
         {
             if (argLast)
-                UsageError(Flag(arg) << " requires a format to be specified");
+                USAGE_ERROR(FORMAT_FLAG(arg) <<
+                            " requires a format to be specified");
             char* formatSpecifier = argv[argI++];
 
             char* format = formatSpecifier;
@@ -137,41 +144,37 @@ int main(int argc, char** argv)
                     path = NULL;
             }
 
-            if (!strcmp(format, "console"))
-            {
-                if (path)
-                {
+#define ADD_OUTPUTTER(_prefix)                                          \
+            {                                                           \
+                if (path)                                               \
+                    fileOutputters.push_back(                           \
+                        new ::hayai::_prefix ## FileOutputter(path)     \
+                    );                                                  \
+                else                                                    \
+                {                                                       \
+                    if (stdoutOutputter)                                \
+                        delete stdoutOutputter;                         \
+                    stdoutOutputter =                                   \
+                        new ::hayai::_prefix ## Outputter(std::cout);   \
+                }                                                       \
+            }
 
-                }
-                else
-                {
-                    if (stdoutOutputter)
-                        delete stdoutOutputter;
-                    stdoutOutputter = new ::hayai::ConsoleOutputter();
-                }
-            }
+            if (!strcmp(format, "console"))
+                ADD_OUTPUTTER(Console)
             else if (!strcmp(format, "json"))
-            {
-                if (path)
-                    fileOutputters.push_back(
-                        new ::hayai::JsonFileOutputter(path)
-                    );
-                else
-                {
-                    if (stdoutOutputter)
-                        delete stdoutOutputter;
-                    stdoutOutputter = new ::hayai::JsonOutputter(std::cout);
-                }
-            }
+                ADD_OUTPUTTER(Json)
             else
-                UsageError("invalid format: " << format);
+                USAGE_ERROR("invalid format: " << format);
+
+#undef ADD_OUTPUTTER
         }
         // Console coloring flag.
         else if ((!strcmp(arg, "-c")) || (!strcmp(arg, "--color")))
         {
             if (argLast)
-                UsageError(Flag(arg) << " requires an argument of either " <<
-                         Flag("yes") << " or " << Flag("no"));
+                USAGE_ERROR(FORMAT_FLAG(arg) << " requires an argument " <<
+                            "of either " << FORMAT_FLAG("yes") << " or " <<
+                            FORMAT_FLAG("no"));
 
             char* choice = argv[argI++];
 
@@ -186,8 +189,8 @@ int main(int argc, char** argv)
                      (!strcmp(choice, "0")))
             {}
             else
-                UsageError("invalid argument to " << Flag(arg) << ": " <<
-                           choice);
+                USAGE_ERROR("invalid argument to " << FORMAT_FLAG(arg) <<
+                           ": " << choice);
         }
         // Help
         else if ((!strcmp(arg, "-?")) ||
@@ -198,7 +201,7 @@ int main(int argc, char** argv)
             return EXIT_FAILURE;
         }
         else
-            UsageError("unknown option: " << arg);
+            USAGE_ERROR("unknown option: " << arg);
     }
 
     // Execute based on the selected mode.
@@ -227,9 +230,7 @@ int main(int argc, char** argv)
             }
             catch (std::exception& e)
             {
-                std::cerr << ::hayai::Console::TextRed << "Error"
-                          << ::hayai::Console::TextDefault << ": " << e.what()
-                          << std::endl;
+                std::cerr << FORMAT_ERROR(e.what()) << std::endl;
                 return EXIT_FAILURE;
             }
 
