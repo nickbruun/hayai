@@ -72,15 +72,6 @@ namespace hayai
         }
 
 
-        /// Add an inclusion filter pattern.
-
-        /// @param pattern Inclusion pattern.
-        static void AddIncludeFilter(const std::string& pattern)
-        {
-            Instance()._include.push_back(pattern);
-        }
-
-
         /// Add an outputter.
 
         /// @param outputter Outputter. The caller must ensure that the
@@ -89,6 +80,57 @@ namespace hayai
         {
             Instance()._outputters.push_back(&outputter);
         }
+
+
+        /// Apply a pattern filter to the tests.
+
+        /// --gtest_filter-compatible pattern:
+        ///
+        /// https://code.google.com/p/googletest/wiki/AdvancedGuide
+        ///
+        /// @param pattern Filter pattern compatible with gtest.
+        static void ApplyPatternFilter(const char* pattern)
+        {
+            Benchmarker& instance = Instance();
+
+            // Split the filter at '-' if it exists.
+            const char* const dash = strchr(pattern, '-');
+
+            std::string positive;
+            std::string negative;
+
+            if (dash == NULL)
+                positive = pattern;
+            else
+            {
+                positive = std::string(pattern, dash);
+                negative = std::string(dash + 1);
+                if (positive.empty())
+                    positive = "*";
+            }
+
+            // Iterate across all tests and test them against the patterns.
+            std::size_t index = 0;
+            while (index < instance._tests.size())
+            {
+                TestDescriptor* desc = instance._tests[index];
+
+                if ((!FilterMatchesString(positive.c_str(),
+                                          desc->CanonicalName)) ||
+                    (FilterMatchesString(negative.c_str(),
+                                         desc->CanonicalName)))
+                {
+                    instance._tests.erase(
+                        instance._tests.begin() +
+                        std::vector<TestDescriptor*>::difference_type(index)
+                    );
+                    delete desc;
+                }
+                else
+                    ++index;
+            }
+        }
+
 
         /// Run all benchmarking tests.
         static void RunAllTests()
@@ -262,35 +304,61 @@ namespace hayai
 
             std::size_t index = 0;
             while (index < _tests.size())
-            {
-                // Get the test descriptor.
-                TestDescriptor* descriptor = _tests[index++];
-
-                // Check if test matches include filters
-                if (!_include.empty())
-                {
-                    bool included = false;
-                    std::string name =
-                        descriptor->FixtureName + "." + descriptor->TestName;
-
-                    for (std::size_t i = 0; i < _include.size(); i++)
-                    {
-                        if (name.find(_include[i]) != std::string::npos)
-                        {
-                            included = true;
-                            break;
-                        }
-                    }
-
-                    if (!included)
-                        continue;
-                }
-
-                tests.push_back(descriptor);
-            }
+                tests.push_back(_tests[index++]);
 
             return tests;
         }
+
+
+        /// Test if a filter matches a string.
+
+        /// Adapted from gtest. All rights reserved by original authors.
+        static bool FilterMatchesString(const char* filter,
+                                        const std::string& str)
+        {
+            const char *patternStart = filter;
+
+            while (true)
+            {
+                if (PatternMatchesString(patternStart, str.c_str()))
+                    return true;
+
+                // Finds the next pattern in the filter.
+                patternStart = strchr(patternStart, ':');
+
+                // Returns if no more pattern can be found.
+                if (!patternStart)
+                    return false;
+
+                // Skips the pattern separater (the ':' character).
+                patternStart++;
+            }
+        }
+
+
+        /// Test if pattern matches a string.
+
+        /// Adapted from gtest. All rights reserved by original authors.
+        static bool PatternMatchesString(const char* pattern, const char *str)
+        {
+            switch (*pattern)
+            {
+            case '\0':
+            case ':':
+                return (*str == '\0');
+            case '?':  // Matches any single character.
+                return ((*str != '\0') &&
+                        (PatternMatchesString(pattern + 1, str + 1)));
+            case '*':  // Matches any string (possibly empty) of characters.
+                return (((*str != '\0') &&
+                         (PatternMatchesString(pattern, str + 1))) ||
+                        (PatternMatchesString(pattern + 1, str)));
+            default:
+                return ((*pattern == *str) &&
+                        (PatternMatchesString(pattern + 1, str + 1)));
+            }
+        }
+
 
         std::vector<Outputter*> _outputters; ///< Registered outputters.
         std::vector<TestDescriptor*> _tests; ///< Registered tests.

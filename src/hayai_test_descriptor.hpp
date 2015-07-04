@@ -310,6 +310,7 @@ namespace hayai
                        bool isDisabled = false)
             :   FixtureName(fixtureName),
                 TestName(testName),
+                CanonicalName(std::string(fixtureName) + "." + testName),
                 Runs(runs),
                 Iterations(iterations),
                 Factory(testFactory),
@@ -333,6 +334,12 @@ namespace hayai
 
         /// Test name.
         std::string TestName;
+
+
+        /// Canonical name.
+
+        /// As: <FixtureName>.<TestName>.
+        std::string CanonicalName;
 
 
         /// Test runs.

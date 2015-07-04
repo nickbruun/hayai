@@ -51,7 +51,11 @@ static void ShowUsage(const char* execName)
               << "running them." << std::endl
               << "  " << FORMAT_FLAG("-f") << ", " << FORMAT_FLAG("--filter")
               << " <" << FORMAT_ARGUMENT("pattern") << ">" << std::endl
-              << "    Run only tests that match a given pattern." << std::endl
+              << "    Run only the tests whose name matches one of the "
+              << "positive patterns but" << std::endl
+              << "    none of the negative patterns. '?' matches any single "
+              << "character; '*'" << std::endl
+              << "    matches any substring; ':' separates two patterns."
               << std::endl
 
               << "Benchmark execution options:" << std::endl
@@ -128,6 +132,16 @@ int main(int argc, char** argv)
         // Shuffle flag.
         else if ((!strcmp(arg, "-s")) || (!strcmp(arg, "--shuffle")))
             shuffle = true;
+        // Filter flag.
+        else if ((!strcmp(arg, "-f")) || (!strcmp(arg, "--filter")))
+        {
+            if ((argLast) || (*argv[argI] == 0))
+                USAGE_ERROR(FORMAT_FLAG(arg) <<
+                            " requires a pattern to be specified");
+            char* pattern = argv[argI++];
+
+            ::hayai::Benchmarker::ApplyPatternFilter(pattern);
+        }
         // Output flag.
         else if ((!strcmp(arg, "-o")) || (!strcmp(arg, "--output")))
         {
@@ -213,10 +227,6 @@ int main(int argc, char** argv)
     {
     case ::hayai::MainRunBenchmarks:
     {
-        // Ensure that at least one output exists.
-        if ((!stdoutOutputter) && (fileOutputters.empty()))
-            stdoutOutputter = new ::hayai::ConsoleOutputter();
-
         // Hook up the outputs.
         if (stdoutOutputter)
             ::hayai::Benchmarker::AddOutputter(*stdoutOutputter);
@@ -260,15 +270,12 @@ int main(int argc, char** argv)
              it < tests.end();
              ++it)
         {
-            std::stringstream testNameStream;
-            testNameStream << (*it)->FixtureName << "." << (*it)->TestName;
-            std::string testName = testNameStream.str();
-
-            if (uniqueTestNames.find(testName) != uniqueTestNames.end())
+            if (uniqueTestNames.find((*it)->CanonicalName) !=
+                uniqueTestNames.end())
                 continue;
 
-            testNames.push_back(testName);
-            uniqueTestNames.insert(testName);
+            testNames.push_back((*it)->CanonicalName);
+            uniqueTestNames.insert((*it)->CanonicalName);
         }
 
         // Sort the benchmark names.
@@ -284,7 +291,7 @@ int main(int argc, char** argv)
     }
     }
 
-    // Clean up the outputs.
+    // Clean up the outputters.
     for (std::vector< ::hayai::FileOutputter*>::iterator it =
              fileOutputters.begin();
          it < fileOutputters.end();
