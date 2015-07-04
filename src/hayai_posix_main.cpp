@@ -178,20 +178,23 @@ int main(int argc, char** argv)
                             FORMAT_FLAG("no"));
 
             char* choice = argv[argI++];
+            bool enabled;
 
             if ((!strcmp(choice, "yes")) ||
                 (!strcmp(choice, "true")) ||
                 (!strcmp(choice, "on")) ||
                 (!strcmp(choice, "1")))
-            {}
+                enabled = true;
             else if ((!strcmp(choice, "no")) ||
                      (!strcmp(choice, "false")) ||
                      (!strcmp(choice, "off")) ||
                      (!strcmp(choice, "0")))
-            {}
+                enabled = false;
             else
                 USAGE_ERROR("invalid argument to " << FORMAT_FLAG(arg) <<
                            ": " << choice);
+
+            ::hayai::Console::SetFormattingEnabled(enabled);
         }
         // Help
         else if ((!strcmp(arg, "-?")) ||
