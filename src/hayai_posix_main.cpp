@@ -1,10 +1,3 @@
-#include <algorithm>
-#include <cstdlib>
-#include <cstring>
-#include <errno.h>
-#include <set>
-#include <vector>
-
 #include "hayai_main.hpp"
 
 
@@ -109,11 +102,13 @@ static void ShowUsage(const char* execName)
 
 int main(int argc, char** argv)
 {
+    std::srand(static_cast<unsigned>(std::time(0)));
+
     // Set up defaults.
     ::hayai::MainExecutionMode execMode = ::hayai::MainRunBenchmarks;
-    bool shuffle = false;
     std::vector< ::hayai::FileOutputter*> fileOutputters;
     ::hayai::Outputter* stdoutOutputter = NULL;
+    bool shuffle = false;
 
     // Parse the arguments.
     int argI = 1;
@@ -210,7 +205,7 @@ int main(int argc, char** argv)
 
             ::hayai::Console::SetFormattingEnabled(enabled);
         }
-        // Help
+        // Help.
         else if ((!strcmp(arg, "-?")) ||
                  (!strcmp(arg, "-h")) ||
                  (!strcmp(arg, "--help")))
@@ -252,6 +247,9 @@ int main(int argc, char** argv)
         }
 
         // Run the benchmarks.
+        if (shuffle)
+            ::hayai::Benchmarker::ShuffleTests();
+
         ::hayai::Benchmarker::RunAllTests();
 
         break;

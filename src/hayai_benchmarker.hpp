@@ -1,11 +1,10 @@
 #ifndef __HAYAI_BENCHMARKER
 #define __HAYAI_BENCHMARKER
+#include <algorithm>
 #include <vector>
-#include <iostream>
 #include <limits>
 #include <iomanip>
 #include <string>
-#include <fstream>
 #include <cstring>
 
 #include "hayai_test_factory.hpp"
@@ -135,8 +134,15 @@ namespace hayai
         /// Run all benchmarking tests.
         static void RunAllTests()
         {
+            ConsoleOutputter defaultOutputter;
+            std::vector<Outputter*> defaultOutputters;
+            defaultOutputters.push_back(&defaultOutputter);
+
             Benchmarker& instance = Instance();
-            std::vector<Outputter*>& outputters = instance._outputters;
+            std::vector<Outputter*>& outputters =
+                (instance._outputters.empty() ?
+                 defaultOutputters :
+                 instance._outputters);
 
             // Get the tests for execution.
             std::vector<TestDescriptor*> tests = instance.GetTests();
@@ -278,6 +284,17 @@ namespace hayai
                 tests.push_back(instance._tests[index++]);
 
             return tests;
+        }
+
+
+        /// Shuffle tests.
+
+        /// Randomly shuffles the order of tests.
+        static void ShuffleTests()
+        {
+            Benchmarker& instance = Instance();
+            std::random_shuffle(instance._tests.begin(),
+                                instance._tests.end());
         }
     private:
         /// Private constructor.

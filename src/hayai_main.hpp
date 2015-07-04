@@ -1,5 +1,13 @@
 #ifndef __HAYAI_MAIN
 #define __HAYAI_MAIN
+#include <algorithm>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <errno.h>
+#include <fstream>
+#include <set>
+#include <vector>
 
 #include "hayai.hpp"
 
