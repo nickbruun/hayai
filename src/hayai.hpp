@@ -10,7 +10,7 @@
 #include "hayai_junit_xml_outputter.hpp"
 
 
-#define HAYAI_VERSION "1.0.0-pre"
+#define HAYAI_VERSION "1.0.0"
 
 
 #define BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name) \
@@ -45,7 +45,7 @@
             new ::hayai::TestFactoryDefault<                            \
                 BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)     \
             >(),                                                        \
-            ::hayai::TestParametersDescriptor());                           \
+            ::hayai::TestParametersDescriptor());                       \
                                                                         \
     void BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name)::TestBody()
 
