@@ -1,6 +1,8 @@
 #ifndef __HAYAI_OUTPUTTER
 #define __HAYAI_OUTPUTTER
+#include <iostream>
 #include <cstddef>
+
 #include "hayai_test_result.hpp"
 
 
@@ -76,6 +78,35 @@ namespace hayai
         virtual ~Outputter()
         {
 
+        }
+    protected:
+        /// Write a nicely formatted test name to a stream.
+        static void WriteTestNameToStream(std::ostream& stream,
+                                          const std::string& fixtureName,
+                                          const std::string& testName,
+                                          const TestParametersDescriptor&
+                                              parameters)
+        {
+            stream << fixtureName << "." << testName;
+
+            const std::vector<TestParameterDescriptor>& descs =
+                parameters.Parameters();
+
+            if (descs.empty())
+                return;
+
+            stream << "(";
+
+            for (std::size_t i = 0; i < descs.size(); ++i)
+            {
+                if (i)
+                    stream << ", ";
+
+                const TestParameterDescriptor& desc = descs[i];
+                stream << desc.Declaration << " = " << desc.Value;
+            }
+
+            stream << ")";
         }
     };
 }

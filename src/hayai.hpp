@@ -7,6 +7,7 @@
 #include "hayai_fixture.hpp"
 #include "hayai_console_outputter.hpp"
 #include "hayai_json_outputter.hpp"
+#include "hayai_junit_xml_outputter.hpp"
 
 
 #define HAYAI_VERSION "1.0.0-pre"

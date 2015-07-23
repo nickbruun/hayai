@@ -73,6 +73,8 @@ static void ShowUsage(const char* execName)
               << "      Standard console output." << std::endl
               << "    " << FORMAT_ARGUMENT("json") << std::endl
               << "      JSON." << std::endl
+              << "    " << FORMAT_ARGUMENT("junit") << std::endl
+              << "      JUnit-compatible XML (very restrictive.)" << std::endl
               << std::endl
               << "    If multiple output formats are provided without a "
               << "path, only the last" << std::endl
@@ -173,6 +175,8 @@ int main(int argc, char** argv)
                 ADD_OUTPUTTER(Console)
             else if (!strcmp(format, "json"))
                 ADD_OUTPUTTER(Json)
+            else if (!strcmp(format, "junit"))
+                ADD_OUTPUTTER(JUnitXml)
             else
                 USAGE_ERROR("invalid format: " << format);
 

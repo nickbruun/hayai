@@ -14,10 +14,9 @@ public:
     {
         // Waste some clock cycles here.
         std::size_t largeNumber = 10000u * distance / _speed;
+        volatile std::size_t targetNumber;
         while (largeNumber--)
-        {
-
-        }
+            targetNumber = largeNumber;
     }
 
 

@@ -93,45 +93,26 @@ namespace hayai
     };
 
 
-    class JsonFileOutputter
-        :   public FileOutputter
-    {
-    public:
-        /// JSON file outputter.
-
-        /// @param path Output path. Expected to be available during the life
-        /// time of the outputter.
-        JsonFileOutputter(const char* path)
-            :   FileOutputter(path)
-        {
-
-        }
-    protected:
-        virtual ::hayai::Outputter* CreateOutputter(std::ostream& stream)
-        {
-            return new ::hayai::JsonOutputter(stream);
-        }
-    };
+#define FILE_OUTPUTTER_IMPLEMENTATION(_prefix)                          \
+    class _prefix ## FileOutputter                                      \
+        :   public FileOutputter                                        \
+    {                                                                   \
+    public:                                                             \
+        _prefix ## FileOutputter(const char* path)                      \
+            :   FileOutputter(path)                                     \
+        {}                                                              \
+    protected:                                                          \
+        virtual ::hayai::Outputter* CreateOutputter(std::ostream& stream) \
+        {                                                               \
+            return new ::hayai::_prefix ## Outputter(stream);           \
+        }                                                               \
+    }
 
 
-    class ConsoleFileOutputter
-        :   public FileOutputter
-    {
-    public:
-        /// Console file outputter.
+    FILE_OUTPUTTER_IMPLEMENTATION(Json);
+    FILE_OUTPUTTER_IMPLEMENTATION(Console);
+    FILE_OUTPUTTER_IMPLEMENTATION(JUnitXml);
 
-        /// @param path Output path. Expected to be available during the life
-        /// time of the outputter.
-        ConsoleFileOutputter(const char* path)
-            :   FileOutputter(path)
-        {
-
-        }
-    protected:
-        virtual ::hayai::Outputter* CreateOutputter(std::ostream& stream)
-        {
-            return new ::hayai::ConsoleOutputter(stream);
-        }
-    };
+#undef FILE_OUTPUTTER_IMPLEMENTATION
 }
 #endif

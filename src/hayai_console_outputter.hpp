@@ -81,7 +81,7 @@ namespace hayai
                 _stream << Console::TextGreen << "[ RUN      ]";
 
             _stream << Console::TextYellow << " ";
-            WriteFormattedName(_stream, fixtureName, testName, parameters);
+            WriteTestNameToStream(_stream, fixtureName, testName, parameters);
             _stream << Console::TextDefault
                     << " (" << runsCount
                     << (runsCount == 1 ? " run, " : " runs, ")
@@ -172,7 +172,7 @@ namespace hayai
 
             _stream << Console::TextGreen << "[     DONE ]"
                     << Console::TextYellow << " ";
-            WriteFormattedName(_stream, fixtureName, testName, parameters);
+            WriteTestNameToStream(_stream, fixtureName, testName, parameters);
             _stream << Console::TextDefault << " ("
                     << std::setprecision(6)
                     << (result.TimeTotal() / 1000000.0) << " ms)"
@@ -242,35 +242,6 @@ namespace hayai
 #undef PAD_DEVIATION_INVERSE
 #undef PAD_DEVIATION
 #undef PAD
-        }
-    private:
-        inline void WriteFormattedName(
-            std::ostream& stream,
-            const std::string& fixtureName,
-            const std::string& testName,
-            const TestParametersDescriptor& parameters
-        )
-        {
-            stream << fixtureName << "." << testName;
-
-            const std::vector<TestParameterDescriptor>& descs =
-                parameters.Parameters();
-
-            if (descs.empty())
-                return;
-
-            stream << "(";
-
-            for (std::size_t i = 0; i < descs.size(); ++i)
-            {
-                if (i)
-                    stream << ", ";
-
-                const TestParameterDescriptor& desc = descs[i];
-                stream << desc.Declaration << " = " << desc.Value;
-            }
-
-            stream << ")";
         }
 
 
