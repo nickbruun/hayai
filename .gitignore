@@ -18,4 +18,5 @@ tests/tests
 /install_manifest.txt
 /Testing
 /debian/changelog
+/debian/copyright
 /dist

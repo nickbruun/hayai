@@ -97,6 +97,10 @@ def pack_orig_tarball(tarball_path,
                         distribution,
                         package_version_suffix)
 
+    # Copy the copyright notice.
+    shutil.copy(os.path.join(SRC_DIR, 'LICENSE.md'),
+                os.path.join(SRC_DIR, 'debian/copyright'))
+
     # Create the tarball.
     subprocess.check_call([
         'tar',
