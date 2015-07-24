@@ -10,7 +10,6 @@ import shutil
 import subprocess
 import tempfile
 import time
-from StringIO import StringIO
 from collections import namedtuple
 from email import utils as email_utils
 
