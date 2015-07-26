@@ -17,3 +17,6 @@ tests/tests
 /hayai-targets.cmake
 /install_manifest.txt
 /Testing
+/debian/changelog
+/debian/copyright
+/dist

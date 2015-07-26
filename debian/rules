@@ -1,0 +1,54 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# Use standard biuld flags, but with assertions disabled (for performance).
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+
+DEB_HOST_GNU_TYPE   ?= $(shell dpkg-architecture -qDEB_HOST_GNU_TYPE)
+DEB_BUILD_GNU_TYPE  ?= $(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+ifneq ($(DEB_HOST_GNU_TYPE),$(DEB_BUILD_GNU_TYPE))
+CROSS= --build $(DEB_BUILD_GNU_TYPE) --host $(DEB_HOST_GNU_TYPE)
+else
+CROSS= --build $(DEB_BUILD_GNU_TYPE)
+endif
+INSTALL_ROOT=$(CURDIR)/debian/tmp
+
+build-arch: build
+build-indep: build
+build: 
+	dh_testdir
+	dh_prep
+	cmake -DCMAKE_INSTALL_PREFIX:PATH=$(INSTALL_ROOT)/usr .
+	$(MAKE)
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	[ ! -f Makefile ] || $(MAKE) clean
+	dh_clean
+
+binary: binary-arch
+binary-indep:
+binary-arch:
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+	make install
+	dh_install
+	dh_installdocs
+	dh_link
+	dh_strip
+	dh_compress
+	dh_fixperms
+	dh_makeshlibs
+	dh_installdeb
+	dh_shlibdeps
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+.PHONY: build clean binary binary-indep binary-arch
