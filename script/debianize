@@ -1,0 +1,185 @@
+#!/usr/bin/env python2.7
+"""debianization script for hayai.
+
+Creates uploadable Debian package sources in dist/<distro>.
+"""
+
+import datetime
+import os
+import shutil
+import subprocess
+import tempfile
+import time
+from collections import namedtuple
+from email import utils as email_utils
+
+
+ChangeLogEntry = namedtuple('ChangeLogEntry',
+                            ('version',
+                             'package_version',
+                             'urgency',
+                             'notes',
+                             'author',
+                             'date', ))
+
+
+SRC_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+"""Source directory.
+"""
+
+PACKAGE_NAME = 'hayai'
+"""Package name.
+"""
+
+CHANGELOG_ENTRIES = (
+    ChangeLogEntry(version='1.0.0',
+                   package_version='1',
+                   urgency='high',
+                   notes='Release of version 1.0.0.',
+                   author='Nick Bruun <nick@bruun.co>',
+                   date=datetime.datetime(2015, 7, 24, 1, 21, 14)),
+)
+"""Change log entries.
+
+Must be in descending order.
+"""
+
+
+def rfc2822_timestamp(dt):
+    return email_utils.formatdate(time.mktime(dt.timetuple()))
+
+
+def write_changelog(f, entries, distribution, package_version_suffix=''):
+    """Write changelog.
+
+    :param f: File to write changelog to.
+    :param entries: Change log entries.
+    :param distribution: Distribution code name.
+    :param package_version_suffix: Optional package version suffix.
+    """
+
+    for i, entry in enumerate(entries):
+        if i:
+            f.write('\n')
+
+        f.write('%s (%s) %s; urgency=%s\n' % (
+            PACKAGE_NAME,
+            '%s-%s%s~%s1' % (entry.version,
+                             entry.package_version,
+                             package_version_suffix,
+                             distribution),
+            distribution,
+            entry.urgency,
+        ))
+        f.write('\n')
+        for l in entry.notes.split('\n'):
+            f.write('  %s\n' % (l))
+        f.write('\n')
+        f.write(' -- %s  %s\n' % (entry.author, rfc2822_timestamp(entry.date)))
+
+
+def pack_orig_tarball(tarball_path,
+                      tarball_dir_name,
+                      changelog_entries,
+                      distribution,
+                      package_version_suffix=''):
+    """Pack original tarball.
+
+    :param changelog_entries: Change log entries.
+    :param distribution: Distribution code name.
+    :param package_version_suffix: Optional package version suffix.
+    """
+
+    # Write the changelog.
+    changelog_path = os.path.join(SRC_DIR, 'debian/changelog')
+
+    with open(changelog_path, 'w') as f:
+        write_changelog(f,
+                        changelog_entries,
+                        distribution,
+                        package_version_suffix)
+
+    # Copy the copyright notice.
+    shutil.copy(os.path.join(SRC_DIR, 'LICENSE.md'),
+                os.path.join(SRC_DIR, 'debian/copyright'))
+
+    # Create the tarball.
+    subprocess.check_call([
+        'tar',
+        '-czf',
+        tarball_path,
+        '--exclude', '%s/.*' % (os.path.basename(SRC_DIR)),
+        '--transform', 's/%s/%s/' % (os.path.basename(SRC_DIR),
+                                     tarball_dir_name),
+        os.path.basename(SRC_DIR),
+    ], cwd=os.path.dirname(SRC_DIR))
+
+    # Remove the changelog.
+    os.unlink(changelog_path)
+
+
+def debianize(output_dir,
+              changelog_entries,
+              distribution,
+              package_version_suffix=''):
+    # Create a build directory.
+    build_dir = tempfile.mkdtemp()
+
+    try:
+        # Create the original tarball.
+        tarball_name = '%s_%s.orig.tar.gz' % (PACKAGE_NAME,
+                                              changelog_entries[0].version)
+        tarball_dir_name = '%s-%s' % (PACKAGE_NAME,
+                                      changelog_entries[0].version)
+        tarball_path = os.path.join(build_dir, tarball_name)
+
+        pack_orig_tarball(tarball_path,
+                          tarball_dir_name,
+                          changelog_entries,
+                          distribution,
+                          package_version_suffix)
+
+        # Unpack the tarball.
+        subprocess.check_call([
+            'tar',
+            '-xf',
+            tarball_name,
+        ], cwd=build_dir)
+
+        # Invoke debuild.
+        debuild_args = ['debuild', '-S', '-sa']
+        if os.getenv('GPG_KEY_ID'):
+            debuild_args.append('-k%s' % (os.environ['GPG_KEY_ID']))
+
+        subprocess.check_call(debuild_args,
+                              cwd=os.path.join(build_dir, tarball_dir_name))
+
+        # Remove the unpacked sources.
+        shutil.rmtree(os.path.join(build_dir, tarball_dir_name))
+
+        # Move the result to the output directory.
+        for filename in os.listdir(build_dir):
+            shutil.move(os.path.join(build_dir, filename),
+                        os.path.join(output_dir, filename))
+    finally:
+        shutil.rmtree(build_dir)
+
+
+dist_dir = os.path.join(SRC_DIR, 'dist')
+if not os.path.exists(dist_dir):
+    os.mkdir(dist_dir)
+
+for distribution, package_version_suffix in (
+        ('trusty', 'ppa1'),
+        ('precise', 'ppa1'),
+):
+    distribution_dir = os.path.join(dist_dir, distribution)
+
+    if os.path.exists(distribution_dir):
+        shutil.rmtree(distribution_dir)
+    os.mkdir(distribution_dir)
+
+    debianize(distribution_dir,
+              CHANGELOG_ENTRIES,
+              distribution,
+              package_version_suffix)
