@@ -90,10 +90,6 @@ def pack_orig_tarball(tarball_path,
     :param package_version_suffix: Optional package version suffix.
     """
 
-    # Copy the copyright notice.
-    shutil.copy(os.path.join(SRC_DIR, 'LICENSE.md'),
-                os.path.join(SRC_DIR, 'debian/copyright'))
-
     # Create the tarball.
     subprocess.check_call([
         'tar',
@@ -101,6 +97,7 @@ def pack_orig_tarball(tarball_path,
         tarball_path,
         '--exclude', '%s/.*' % (os.path.basename(SRC_DIR)),
         '--exclude', '%s/dist' % (os.path.basename(SRC_DIR)),
+        '--exclude', '%s/debian' % (os.path.basename(SRC_DIR)),
         '--transform', 's/%s/%s/' % (os.path.basename(SRC_DIR),
                                      tarball_dir_name),
         os.path.basename(SRC_DIR),
@@ -136,6 +133,13 @@ def debianize(output_dir,
         ], cwd=build_dir)
 
         build_dir_unpacked = os.path.join(build_dir, tarball_dir_name)
+
+        # Copy over the debian directory.
+        shutil.copytree(os.path.join(SRC_DIR, 'debian'),
+                        os.path.join(build_dir_unpacked, 'debian'))
+
+        shutil.copy(os.path.join(SRC_DIR, 'LICENSE.md'),
+                    os.path.join(build_dir_unpacked, 'debian/copyright'))
 
         # Write the changelog.
         changelog_path = os.path.join(build_dir_unpacked, 'debian/changelog')
