@@ -147,11 +147,11 @@ def debianize(output_dir,
         ], cwd=build_dir)
 
         # Invoke debuild.
-        subprocess.check_call(['debuild',
-                               '-S',
-                               '-sa'] +
-                              ['-k%s' % (os.environ['GPG_KEY_ID'])]
-                              if os.getenv('GPG_KEY_ID') else [],
+        debuild_args = ['debuild', '-S', '-sa']
+        if os.getenv('GPG_KEY_ID'):
+            debuild_args.append('-k%s' % (os.environ['GPG_KEY_ID']))
+
+        subprocess.check_call(debuild_args,
                               cwd=os.path.join(build_dir, tarball_dir_name))
 
         # Remove the unpacked sources.
