@@ -90,15 +90,6 @@ def pack_orig_tarball(tarball_path,
     :param package_version_suffix: Optional package version suffix.
     """
 
-    # Write the changelog.
-    changelog_path = os.path.join(SRC_DIR, 'debian/changelog')
-
-    with open(changelog_path, 'w') as f:
-        write_changelog(f,
-                        changelog_entries,
-                        distribution,
-                        package_version_suffix)
-
     # Copy the copyright notice.
     shutil.copy(os.path.join(SRC_DIR, 'LICENSE.md'),
                 os.path.join(SRC_DIR, 'debian/copyright'))
@@ -109,13 +100,11 @@ def pack_orig_tarball(tarball_path,
         '-czf',
         tarball_path,
         '--exclude', '%s/.*' % (os.path.basename(SRC_DIR)),
+        '--exclude', '%s/dist' % (os.path.basename(SRC_DIR)),
         '--transform', 's/%s/%s/' % (os.path.basename(SRC_DIR),
                                      tarball_dir_name),
         os.path.basename(SRC_DIR),
     ], cwd=os.path.dirname(SRC_DIR))
-
-    # Remove the changelog.
-    os.unlink(changelog_path)
 
 
 def debianize(output_dir,
@@ -146,13 +135,23 @@ def debianize(output_dir,
             tarball_name,
         ], cwd=build_dir)
 
+        build_dir_unpacked = os.path.join(build_dir, tarball_dir_name)
+
+        # Write the changelog.
+        changelog_path = os.path.join(build_dir_unpacked, 'debian/changelog')
+
+        with open(changelog_path, 'w') as f:
+            write_changelog(f,
+                            changelog_entries,
+                            distribution,
+                            package_version_suffix)
+
         # Invoke debuild.
         debuild_args = ['debuild', '-S', '-sa']
         if os.getenv('GPG_KEY_ID'):
             debuild_args.append('-k%s' % (os.environ['GPG_KEY_ID']))
 
-        subprocess.check_call(debuild_args,
-                              cwd=os.path.join(build_dir, tarball_dir_name))
+        subprocess.check_call(debuild_args, cwd=build_dir_unpacked)
 
         # Remove the unpacked sources.
         shutil.rmtree(os.path.join(build_dir, tarball_dir_name))
