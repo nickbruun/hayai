@@ -79,10 +79,7 @@ def write_changelog(f, entries, distribution, package_version_suffix=''):
 
 
 def pack_orig_tarball(tarball_path,
-                      tarball_dir_name,
-                      changelog_entries,
-                      distribution,
-                      package_version_suffix=''):
+                      tarball_dir_name):
     """Pack original tarball.
 
     :param changelog_entries: Change log entries.
@@ -98,6 +95,7 @@ def pack_orig_tarball(tarball_path,
         '--exclude', '%s/.*' % (os.path.basename(SRC_DIR)),
         '--exclude', '%s/dist' % (os.path.basename(SRC_DIR)),
         '--exclude', '%s/debian' % (os.path.basename(SRC_DIR)),
+        '--exclude', '%s/script' % (os.path.basename(SRC_DIR)),
         '--transform', 's/%s/%s/' % (os.path.basename(SRC_DIR),
                                      tarball_dir_name),
         os.path.basename(SRC_DIR),
@@ -105,6 +103,9 @@ def pack_orig_tarball(tarball_path,
 
 
 def debianize(output_dir,
+              tarball_name,
+              tarball_dir_name,
+              tarball_path,
               changelog_entries,
               distribution,
               package_version_suffix=''):
@@ -112,20 +113,9 @@ def debianize(output_dir,
     build_dir = tempfile.mkdtemp()
 
     try:
-        # Create the original tarball.
-        tarball_name = '%s_%s.orig.tar.gz' % (PACKAGE_NAME,
-                                              changelog_entries[0].version)
-        tarball_dir_name = '%s-%s' % (PACKAGE_NAME,
-                                      changelog_entries[0].version)
-        tarball_path = os.path.join(build_dir, tarball_name)
-
-        pack_orig_tarball(tarball_path,
-                          tarball_dir_name,
-                          changelog_entries,
-                          distribution,
-                          package_version_suffix)
-
         # Unpack the tarball.
+        shutil.copy(tarball_path, os.path.join(build_dir, tarball_name))
+
         subprocess.check_call([
             'tar',
             '-xf',
@@ -162,8 +152,9 @@ def debianize(output_dir,
 
         # Move the result to the output directory.
         for filename in os.listdir(build_dir):
-            shutil.move(os.path.join(build_dir, filename),
-                        os.path.join(output_dir, filename))
+            if filename != tarball_name:
+                shutil.move(os.path.join(build_dir, filename),
+                            os.path.join(output_dir, filename))
     finally:
         shutil.rmtree(build_dir)
 
@@ -176,13 +167,21 @@ for distribution, package_version_suffix in (
         ('trusty', 'ppa1'),
         ('precise', 'ppa1'),
 ):
-    distribution_dir = os.path.join(dist_dir, distribution)
+    # Create the original tarball.
+    tarball_name = '%s_%s.orig.tar.gz' % (PACKAGE_NAME,
+                                          CHANGELOG_ENTRIES[0].version)
+    tarball_dir_name = '%s-%s' % (PACKAGE_NAME,
+                                  CHANGELOG_ENTRIES[0].version)
+    tarball_path = os.path.join(dist_dir, tarball_name)
 
-    if os.path.exists(distribution_dir):
-        shutil.rmtree(distribution_dir)
-    os.mkdir(distribution_dir)
+    if not os.path.exists(tarball_path):
+        pack_orig_tarball(tarball_path, tarball_dir_name)
 
-    debianize(distribution_dir,
+    # Debianize for the given distribution.
+    debianize(dist_dir,
+              tarball_name,
+              tarball_dir_name,
+              tarball_path,
               CHANGELOG_ENTRIES,
               distribution,
               package_version_suffix)
