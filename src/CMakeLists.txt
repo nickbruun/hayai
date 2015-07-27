@@ -2,6 +2,7 @@ file(GLOB hayai_headers
   hayai.hpp
   hayai_benchmarker.hpp
   hayai_clock.hpp
+  hayai_compatibility.hpp
   hayai_console.hpp
   hayai_console_outputter.hpp
   hayai_default_test_factory.hpp
