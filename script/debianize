@@ -5,9 +5,13 @@ Creates uploadable Debian package sources in dist/<distro>.
 """
 
 import datetime
+import gzip
+import fnmatch
 import os
 import shutil
+import stat
 import subprocess
+import tarfile
 import tempfile
 import time
 from collections import namedtuple
@@ -84,28 +88,106 @@ def write_changelog(f, entries, distribution, package_version_suffix=''):
         f.write(' -- %s  %s\n' % (entry.author, rfc2822_timestamp(entry.date)))
 
 
-def pack_orig_tarball(tarball_path,
-                      tarball_dir_name):
+def pack_orig_tarball(tarball_path, tarball_dir_name):
     """Pack original tarball.
+
+    Currently assumes a very simple .gitignore file at the root of the source
+    directory.
 
     :param changelog_entries: Change log entries.
     :param distribution: Distribution code name.
     :param package_version_suffix: Optional package version suffix.
     """
 
-    # Create the tarball.
-    subprocess.check_call([
-        'tar',
-        '-czf',
-        tarball_path,
-        '--exclude', '%s/.*' % (os.path.basename(SRC_DIR)),
-        '--exclude', '%s/dist' % (os.path.basename(SRC_DIR)),
-        '--exclude', '%s/debian' % (os.path.basename(SRC_DIR)),
-        '--exclude', '%s/script' % (os.path.basename(SRC_DIR)),
-        '--transform', 's/%s/%s/' % (os.path.basename(SRC_DIR),
-                                     tarball_dir_name),
-        os.path.basename(SRC_DIR),
-    ], cwd=os.path.dirname(SRC_DIR))
+    # Parse ignore patterns.
+    ignore_patterns = []
+
+    with open(os.path.join(SRC_DIR, '.gitignore'), 'r') as f:
+        for l in f:
+            l = l.strip()
+            if not l or l.startswith('#'):
+                continue
+            ignore_patterns.append(l)
+
+    ignore_patterns += [
+        '.*',  # Ignore all dotfiles.
+        '/Vagrantfile',  # Ignore Vagrantfile.
+        '/debian',
+        '/script',
+    ]
+
+    # Split the ignored patterns into general patterns, general files,
+    # directory-specific patterns, and directory-specific files.
+    general_ignore_patterns = []
+    general_ignore_files = set()
+
+    specific_ignore_files = set()
+
+    for p in ignore_patterns:
+        if '/' in p:
+            if '*' in p:
+                raise NotImplementedError('unsupported pattern: %s' % (p))
+            else:
+                specific_ignore_files.add(p.lstrip('/'))
+        else:
+            if '*' in p:
+                general_ignore_patterns.append(p)
+            else:
+                general_ignore_files.add(p)
+
+    def should_ignore_file(src_path):
+        if src_path in specific_ignore_files:
+            return True
+
+        basename = os.path.basename(src_path)
+        if basename in general_ignore_files:
+            return True
+
+        for p in general_ignore_patterns:
+            if fnmatch.fnmatchcase(basename, p):
+                return True
+
+        return False
+
+    with tempfile.NamedTemporaryFile(suffix='.tar') as tf:
+        # Create the temporary tarball.
+        with tarfile.open(tf.name, 'w') as t:
+            def walk(dir_path):
+                for filename in os.listdir(dir_path):
+                    file_path = os.path.join(dir_path, filename)
+                    src_rel_path = os.path.relpath(file_path, SRC_DIR)
+
+                    if should_ignore_file(src_rel_path):
+                        continue
+
+                    file_stat = os.stat(file_path)
+
+                    if stat.S_ISDIR(file_stat.st_mode):
+                        walk(file_path)
+                    else:
+                        with open(file_path, 'rb') as f:
+                            tar_info = t.gettarinfo(fileobj=f)
+                            tar_info.name = os.path.join(tarball_dir_name,
+                                                         src_rel_path)
+                            tar_info.uid = 1
+                            tar_info.gid = 1
+                            tar_info.uname = 'root'
+                            tar_info.gname = 'root'
+
+                            t.addfile(tar_info, f)
+
+            walk(SRC_DIR)
+
+        # Compress or copy the final tarball.
+        if tarball_path.endswith('.tar'):
+            shutil.copy(tf.name, tarball_path)
+        elif tarball_path.endswith('.gz'):
+            tf.seek(0)
+
+            with gzip.open(tarball_path, 'wb', compresslevel=9) as out_f:
+                out_f.write(tf.read())
+        else:
+            raise NotImplementedError('cannot create %s' % (tarball_path))
 
 
 def debianize(output_dir,

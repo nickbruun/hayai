@@ -1,8 +1,8 @@
-# Ignore temporary files from OS' and editors
+# Ignore temporary files from OS' and editors.
 *~
 .DS_Store
 
-# Ignore build output
+# Ignore build output.
 CMakeCache.txt
 CMakeFiles
 Makefile
@@ -12,7 +12,7 @@ CTestTestfile.cmake
 sample/sample
 tests/tests
 
-/build*
+/build
 /hayai-config.cmake
 /hayai-targets.cmake
 /install_manifest.txt
@@ -20,3 +20,4 @@ tests/tests
 /debian/changelog
 /debian/copyright
 /dist
+/.vagrant
