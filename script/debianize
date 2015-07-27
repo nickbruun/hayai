@@ -252,8 +252,13 @@ if not os.path.exists(dist_dir):
     os.mkdir(dist_dir)
 
 for distribution, package_version_suffix in (
-        ('trusty', 'ppa1'),
-        ('precise', 'ppa1'),
+        ('precise', 'ppa1'),  # Ubuntu 12.04 LTS.
+        ('quantal', 'ppa1'),  # Ubuntu 12.10.
+        ('raring', 'ppa1'),  # Ubuntu 13.04.
+        ('saucy', 'ppa1'),  # Ubuntu 13.10.
+        ('trusty', 'ppa1'),  # Ubuntu 14.04 LTS.
+        ('utopic', 'ppa1'),  # Ubuntu 14.10.
+        ('vivid', 'ppa1'),  # Ubuntu 15.04.
 ):
     # Create the original tarball.
     tarball_name = '%s_%s.orig.tar.gz' % (PACKAGE_NAME,
