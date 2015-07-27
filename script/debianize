@@ -32,6 +32,12 @@ PACKAGE_NAME = 'hayai'
 """
 
 CHANGELOG_ENTRIES = (
+    ChangeLogEntry(version='1.0.1',
+                   package_version='1',
+                   urgency='high',
+                   notes='Patch version 1.0.0. Fixes missing include.',
+                   author='Nick Bruun <nick@bruun.co>',
+                   date=datetime.datetime(2015, 7, 27, 9, 2, 34)),
     ChangeLogEntry(version='1.0.0',
                    package_version='1',
                    urgency='high',

@@ -10,7 +10,7 @@
 #include "hayai_junit_xml_outputter.hpp"
 
 
-#define HAYAI_VERSION "1.0.0"
+#define HAYAI_VERSION "1.0.1"
 
 
 #define BENCHMARK_CLASS_NAME_(fixture_name, benchmark_name) \
