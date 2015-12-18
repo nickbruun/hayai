@@ -19,7 +19,7 @@
     {                                                               \
         std::cerr << FORMAT_ERROR(_desc) << std::endl << std::endl; \
         ShowUsage(argv[0]);                                         \
-        return EXIT_FAILURE;                                        \
+        exit(EXIT_FAILURE);                                         \
     }
 
 
@@ -101,18 +101,7 @@ static void ShowUsage(const char* execName)
               << std::endl;
 }
 
-
-int main(int argc, char** argv)
-{
-    std::srand(static_cast<unsigned>(std::time(0)));
-
-    // Set up defaults.
-    ::hayai::MainExecutionMode execMode = ::hayai::MainRunBenchmarks;
-    std::vector< ::hayai::FileOutputter*> fileOutputters;
-    ::hayai::Outputter* stdoutOutputter = NULL;
-    bool shuffle = false;
-
-    // Parse the arguments.
+static void ParseArgs(int argc, char** argv, ::hayai::MainExecutionMode& execMode, std::vector< ::hayai::FileOutputter*>& fileOutputters, ::hayai::Outputter*& stdoutOutputter, bool& shuffle) {
     int argI = 1;
     while (argI < argc)
     {
@@ -215,11 +204,24 @@ int main(int argc, char** argv)
                  (!strcmp(arg, "--help")))
         {
             ShowUsage(argv[0]);
-            return EXIT_FAILURE;
+            exit(EXIT_FAILURE);
         }
         else
             USAGE_ERROR("unknown option: " << arg);
     }
+}
+
+int main(int argc, char** argv)
+{
+    std::srand(static_cast<unsigned>(std::time(0)));
+
+    // Set up defaults.
+    ::hayai::MainExecutionMode execMode = ::hayai::MainRunBenchmarks;
+    std::vector< ::hayai::FileOutputter*> fileOutputters;
+    ::hayai::Outputter* stdoutOutputter = NULL;
+    bool shuffle = false;
+    ParseArgs(argc, argv, execMode, fileOutputters, stdoutOutputter, shuffle);
+    // Parse the arguments.
 
     // Execute based on the selected mode.
     switch (execMode)
