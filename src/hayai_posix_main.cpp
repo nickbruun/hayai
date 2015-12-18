@@ -18,7 +18,7 @@
 #define USAGE_ERROR(_desc)                                          \
     {                                                               \
         std::cerr << FORMAT_ERROR(_desc) << std::endl << std::endl; \
-        ShowUsage(argv[0]);                                         \
+        ShowUsage((*argv)[0]);                                         \
         exit(EXIT_FAILURE);                                         \
     }
 
@@ -101,12 +101,13 @@ static void ShowUsage(const char* execName)
               << std::endl;
 }
 
-static void ParseArgs(int argc, char** argv, ::hayai::MainExecutionMode& execMode, std::vector< ::hayai::FileOutputter*>& fileOutputters, ::hayai::Outputter*& stdoutOutputter, bool& shuffle) {
+static void ParseArgs(int* argc, char*** argv, ::hayai::MainExecutionMode& execMode, std::vector< ::hayai::FileOutputter*>& fileOutputters, ::hayai::Outputter*& stdoutOutputter, bool& shuffle, bool removeArgs = false) {
+    std::vector<char*> leftArgs;
     int argI = 1;
-    while (argI < argc)
+    while (argI < *argc)
     {
-        char* arg = argv[argI++];
-        bool argLast = (argI == argc);
+        char* arg = (*argv)[argI++];
+        bool argLast = (argI == *argc);
         std::size_t argLen = strlen(arg);
 
         if (argLen == 0)
@@ -121,10 +122,10 @@ static void ParseArgs(int argc, char** argv, ::hayai::MainExecutionMode& execMod
         // Filter flag.
         else if ((!strcmp(arg, "-f")) || (!strcmp(arg, "--filter")))
         {
-            if ((argLast) || (*argv[argI] == 0))
+            if ((argLast) || (*(*argv)[argI] == 0))
                 USAGE_ERROR(FORMAT_FLAG(arg) <<
                             " requires a pattern to be specified");
-            char* pattern = argv[argI++];
+            char* pattern = (*argv)[argI++];
 
             ::hayai::Benchmarker::ApplyPatternFilter(pattern);
         }
@@ -134,7 +135,7 @@ static void ParseArgs(int argc, char** argv, ::hayai::MainExecutionMode& execMod
             if (argLast)
                 USAGE_ERROR(FORMAT_FLAG(arg) <<
                             " requires a format to be specified");
-            char* formatSpecifier = argv[argI++];
+            char* formatSpecifier = (*argv)[argI++];
 
             char* format = formatSpecifier;
             char* path = strchr(formatSpecifier, ':');
@@ -179,7 +180,7 @@ static void ParseArgs(int argc, char** argv, ::hayai::MainExecutionMode& execMod
                             "of either " << FORMAT_FLAG("yes") << " or " <<
                             FORMAT_FLAG("no"));
 
-            char* choice = argv[argI++];
+            char* choice = (*argv)[argI++];
             bool enabled;
 
             if ((!strcmp(choice, "yes")) ||
@@ -203,11 +204,19 @@ static void ParseArgs(int argc, char** argv, ::hayai::MainExecutionMode& execMod
                  (!strcmp(arg, "-h")) ||
                  (!strcmp(arg, "--help")))
         {
-            ShowUsage(argv[0]);
-            exit(EXIT_FAILURE);
+            ShowUsage((*argv)[0]);
+            exit(0);
         }
-        else
-            USAGE_ERROR("unknown option: " << arg);
+        else {
+            //USAGE_ERROR("unknown option: " << arg);
+            leftArgs.push_back(arg);
+        }
+    }
+    if (removeArgs) {
+      (*argc) = leftArgs.size();
+      for (size_t i = 0; i < leftArgs.size(); i++) {
+        (*argv)[i] = leftArgs[i];
+      }
     }
 }
 
@@ -220,8 +229,7 @@ int main(int argc, char** argv)
     std::vector< ::hayai::FileOutputter*> fileOutputters;
     ::hayai::Outputter* stdoutOutputter = NULL;
     bool shuffle = false;
-    ParseArgs(argc, argv, execMode, fileOutputters, stdoutOutputter, shuffle);
-    // Parse the arguments.
+    ParseArgs(&argc, &argv, execMode, fileOutputters, stdoutOutputter, shuffle);
 
     // Execute based on the selected mode.
     switch (execMode)
