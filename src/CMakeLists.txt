@@ -14,6 +14,7 @@ file(GLOB hayai_headers
   hayai_test_descriptor.hpp
   hayai_test_factory.hpp
   hayai_test_result.hpp
+  hayai_main.hpp
 )
 
 add_library(hayai_main
