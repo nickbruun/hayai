@@ -3,8 +3,8 @@
 
 int main(int argc, char** argv)
 {
-    // Set up the main runtime.
-    ::hayai::Runner runner;
+    // Set up the main runner.
+    ::hayai::MainRunner runner;
 
     // Parse the arguments.
     int result = runner.ParseArgs(argc, argv);

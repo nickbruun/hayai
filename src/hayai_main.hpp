@@ -140,10 +140,10 @@ namespace hayai
 
 
     /// Default main executable runner for Hayai.
-    class Runner
+    class MainRunner
     {
     public:
-        Runner()
+        MainRunner()
             :   ExecutionMode(MainRunBenchmarks),
                 ShuffleBenchmarks(false),
                 StdoutOutputter(NULL)
@@ -152,7 +152,7 @@ namespace hayai
         }
 
 
-        ~Runner()
+        ~MainRunner()
         {
             // Clean up the outputters.
             for (std::vector<FileOutputter*>::iterator it =
