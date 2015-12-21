@@ -3,8 +3,6 @@
 
 int main(int argc, char** argv)
 {
-    std::srand(static_cast<unsigned>(std::time(0)));
-
     // Set up the main runtime.
     ::hayai::Runner runner;
 

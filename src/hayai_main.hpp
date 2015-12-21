@@ -144,7 +144,9 @@ namespace hayai
     {
     public:
         Runner()
-            :   ExecutionMode(MainRunBenchmarks)
+            :   ExecutionMode(MainRunBenchmarks),
+                ShuffleBenchmarks(false),
+                StdoutOutputter(NULL)
         {
 
         }
