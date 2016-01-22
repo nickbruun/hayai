@@ -49,7 +49,7 @@ namespace hayai
         /// Total time.
         inline double TimeTotal() const
         {
-            return _timeTotal;
+            return double(_timeTotal);
         }
 
 
@@ -70,14 +70,14 @@ namespace hayai
         /// Maximum time per run.
         inline double RunTimeMaximum() const
         {
-            return _timeRunMax;
+            return double(_timeRunMax);
         }
 
 
         /// Minimum time per run.
         inline double RunTimeMinimum() const
         {
-            return _timeRunMin;
+            return double(_timeRunMin);
         }
 
 
