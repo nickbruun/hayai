@@ -2,6 +2,9 @@
 """debianization script for hayai.
 
 Creates uploadable Debian package sources in dist/<distro>.
+
+Refer to http://ubuntuforums.org/showthread.php?t=1846755 for more details on
+the steps involved.
 """
 
 import datetime
