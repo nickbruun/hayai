@@ -172,6 +172,8 @@ namespace hayai
 
             EndTestObject();
         }
+    protected:
+        std::ostream& _stream;
     private:
         void BeginTestObject(const std::string& fixtureName,
                              const std::string& testName,
@@ -318,7 +320,6 @@ namespace hayai
             _stream << JSON_STRING_END;
         }
 
-
         /// Write a property with a double value.
 
         /// @param key Property key.
@@ -335,8 +336,6 @@ namespace hayai
                     << (value / 1000000.0);
         }
 
-
-        std::ostream& _stream;
         bool _firstTest;
     };
 }

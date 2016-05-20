@@ -8,6 +8,7 @@ file(GLOB hayai_headers
   hayai_default_test_factory.hpp
   hayai_fixture.hpp
   hayai_json_outputter.hpp
+  hayai_html_outputter.hpp
   hayai_junit_xml_outputter.hpp
   hayai_outputter.hpp
   hayai_test.hpp
