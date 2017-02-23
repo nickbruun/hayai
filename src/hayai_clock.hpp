@@ -278,7 +278,7 @@ namespace hayai
             else
                 timeDiff.tv_nsec = endTime.tv_nsec - startTime.tv_nsec;
 
-            return static_cast<uint64_t>(timeDiff.tv_sec * 1000000000L +
+            return static_cast<uint64_t>(timeDiff.tv_sec * 1000000000LL +
                                          timeDiff.tv_nsec);
         }
 
