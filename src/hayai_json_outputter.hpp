@@ -165,9 +165,28 @@ namespace hayai
             _stream <<
                 JSON_ARRAY_END;
 
+	    dumpProperty( "mean", result.RunTimeAverage() );
+	    dumpProperty( "stddev", result.RunTimeStdDev() );
+	    dumpProperty( "median", result.RunTimeMedian() );
+	    dumpProperty( "quartile1", result.RunTimeQuartile1() );
+	    dumpProperty( "quartile3", result.RunTimeQuartile3() );
+
             EndTestObject();
         }
     private:
+	void dumpProperty( const std::string& key, const double value )
+	{
+	    _stream
+                << JSON_VALUE_SEPARATOR
+		<< JSON_STRING_BEGIN
+		<< key
+		<< JSON_STRING_END
+		<< JSON_NAME_SEPARATOR
+		<< std::fixed
+		<< std::setprecision(6)
+		<< (value / 1000000.0);
+	}
+
         void BeginTestObject(const std::string& fixtureName,
                              const std::string& testName,
                              const TestParametersDescriptor& parameters,
