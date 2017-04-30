@@ -182,23 +182,33 @@ namespace hayai
                     << Console::TextDefault
                     << "       Average time: "
                     << std::setprecision(3)
-                    << result.RunTimeAverage() / 1000.0 << " us"
+                    << result.RunTimeAverage() / 1000.0 << " us "
+                    << "(" << Console::TextBlue << "~"
+                    << result.RunTimeStdDev() / 1000.0 << " us"
+                    << Console::TextDefault << ")"
                     << std::endl;
 
-            PAD_DEVIATION_INVERSE("Fastest: ",
+            PAD_DEVIATION_INVERSE("Fastest time: ",
                                   (result.RunTimeMinimum() / 1000.0),
                                   (result.RunTimeAverage() / 1000.0),
                                   "us");
-            PAD_DEVIATION_INVERSE("Slowest: ",
+            PAD_DEVIATION_INVERSE("Slowest time: ",
                                   (result.RunTimeMaximum() / 1000.0),
                                   (result.RunTimeAverage() / 1000.0),
                                   "us");
+            PAD("Median time: "
+		<< result.RunTimeMedian() / 1000.0 << " us "
+		<< "(" << Console::TextCyan << " "
+		<< result.RunTimeQuartile1() / 1000.0 << " | "
+		<< result.RunTimeQuartile3() / 1000.0 << " "
+		<< Console::TextDefault << ")"
+		);
 
             _stream << std::setprecision(5);
 
             PAD("");
             PAD("Average performance: " <<
-                result.RunsPerSecondAverage() << " runs/s");
+                result.RunsPerSecondAverage() << " runs/s " );
             PAD_DEVIATION("Best performance: ",
                           result.RunsPerSecondMaximum(),
                           result.RunsPerSecondAverage(),
@@ -207,37 +217,62 @@ namespace hayai
                           result.RunsPerSecondMinimum(),
                           result.RunsPerSecondAverage(),
                           "runs/s");
+            PAD("Median performance: "
+		<< result.RunsPerSecondMedian() << " runs/s "
+		<< "(" << Console::TextCyan << " "
+		<< result.RunsPerSecondQuartile1() << " | "
+		<< result.RunsPerSecondQuartile3() << " "
+		<< Console::TextDefault << ")"
+		);
 
+            PAD("");
             _stream << Console::TextBlue << "[ITERATIONS] "
                     << Console::TextDefault
                     << std::setprecision(3)
                     << "       Average time: "
-                    << result.IterationTimeAverage() / 1000.0 << " us"
+                    << result.IterationTimeAverage() / 1000.0 << " us "
+		    << "(" << Console::TextBlue << "~"
+		    << result.IterationTimeStdDev() / 1000.0 << " us"
+		    << Console::TextDefault << ")"
                     << std::endl;
 
-            PAD_DEVIATION_INVERSE("Fastest: ",
+            PAD_DEVIATION_INVERSE("Fastest time: ",
                                   (result.IterationTimeMinimum() / 1000.0),
                                   (result.IterationTimeAverage() / 1000.0),
                                   "us");
-            PAD_DEVIATION_INVERSE("Slowest: ",
+            PAD_DEVIATION_INVERSE("Slowest time: ",
                                   (result.IterationTimeMaximum() / 1000.0),
                                   (result.IterationTimeAverage() / 1000.0),
                                   "us");
+            PAD("Median time: "
+		<< result.IterationTimeMedian() / 1000.0 << " us "
+		<< "(" << Console::TextCyan << " "
+		<< result.IterationTimeQuartile1() / 1000.0 << " | "
+		<< result.IterationTimeQuartile3() / 1000.0 << " "
+		<< Console::TextDefault << ")"
+		);
 
             _stream << std::setprecision(5);
 
             PAD("");
             PAD("Average performance: " <<
                 result.IterationsPerSecondAverage() <<
-                " iterations/s");
+                " iter/s " );
             PAD_DEVIATION("Best performance: ",
                           (result.IterationsPerSecondMaximum()),
                           (result.IterationsPerSecondAverage()),
-                          "iterations/s");
+                          "iter/s");
             PAD_DEVIATION("Worst performance: ",
                           (result.IterationsPerSecondMinimum()),
                           (result.IterationsPerSecondAverage()),
-                          "iterations/s");
+                          "iter/s");
+            PAD("Median performance: "
+		<< result.IterationsPerSecondMedian() << " iter/s "
+		<< "(" << Console::TextCyan << " "
+		<< result.IterationsPerSecondQuartile1() << " | "
+		<< result.IterationsPerSecondQuartile3() << " "
+		<< Console::TextDefault << ")"
+		);
 
 #undef PAD_DEVIATION_INVERSE
 #undef PAD_DEVIATION
