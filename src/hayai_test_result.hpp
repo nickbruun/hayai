@@ -49,6 +49,7 @@ namespace hayai
                 ++runIt;
             }
 
+            // Calculate standard deviation.
             const double mean = RunTimeAverage();
             double accu = 0.0;
 
@@ -65,6 +66,7 @@ namespace hayai
 
             _timeStdDev = std::sqrt(accu / (_runTimes.size() - 1));
 
+            // Calculate quartiles.
             std::vector<uint64_t> sortedRunTimes(_runTimes);
             std::sort(sortedRunTimes.begin(), sortedRunTimes.end());
 
