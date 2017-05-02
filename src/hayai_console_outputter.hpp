@@ -196,13 +196,12 @@ namespace hayai
                                   (result.RunTimeMaximum() / 1000.0),
                                   (result.RunTimeAverage() / 1000.0),
                                   "us");
-            PAD("Median time: "
-		<< result.RunTimeMedian() / 1000.0 << " us "
-		<< "(" << Console::TextCyan << " "
-		<< result.RunTimeQuartile1() / 1000.0 << " | "
-		<< result.RunTimeQuartile3() / 1000.0 << " "
-		<< Console::TextDefault << ")"
-		);
+            PAD("Median time: " <<
+                result.RunTimeMedian() / 1000.0 << " us (1st quartile: " <<
+                Console::TextCyan <<
+                result.RunTimeQuartile1() / 1000.0 << " us | 3rd quartile: " <<
+                result.RunTimeQuartile3() / 1000.0 << " us" <<
+                Console::TextDefault << ")");
 
             _stream << std::setprecision(5);
 
@@ -217,13 +216,12 @@ namespace hayai
                           result.RunsPerSecondMinimum(),
                           result.RunsPerSecondAverage(),
                           "runs/s");
-            PAD("Median performance: "
-		<< result.RunsPerSecondMedian() << " runs/s "
-		<< "(" << Console::TextCyan << " "
-		<< result.RunsPerSecondQuartile1() << " | "
-		<< result.RunsPerSecondQuartile3() << " "
-		<< Console::TextDefault << ")"
-		);
+            PAD("Median performance: " <<
+                result.RunsPerSecondMedian() << " runs/s (" <<
+                Console::TextCyan << "1st quartile: " <<
+                result.RunsPerSecondQuartile1() << " | 3rd quartile: " <<
+                result.RunsPerSecondQuartile3() <<
+                Console::TextDefault << ")");
 
             PAD("");
             _stream << Console::TextBlue << "[ITERATIONS] "
@@ -231,9 +229,9 @@ namespace hayai
                     << std::setprecision(3)
                     << "       Average time: "
                     << result.IterationTimeAverage() / 1000.0 << " us "
-		    << "(" << Console::TextBlue << "~"
-		    << result.IterationTimeStdDev() / 1000.0 << " us"
-		    << Console::TextDefault << ")"
+                    << "(" << Console::TextBlue << "~"
+                    << result.IterationTimeStdDev() / 1000.0 << " us"
+                    << Console::TextDefault << ")"
                     << std::endl;
 
             PAD_DEVIATION_INVERSE("Fastest time: ",
@@ -244,12 +242,13 @@ namespace hayai
                                   (result.IterationTimeMaximum() / 1000.0),
                                   (result.IterationTimeAverage() / 1000.0),
                                   "us");
-            PAD("Median time: "
-		<< result.IterationTimeMedian() / 1000.0 << " us "
-		<< "(" << Console::TextCyan << " "
-		<< result.IterationTimeQuartile1() / 1000.0 << " | "
-		<< result.IterationTimeQuartile3() / 1000.0 << " "
-		<< Console::TextDefault << ")");
+            PAD("Median time: " <<
+                result.IterationTimeMedian() / 1000.0 << " us (" <<
+                Console::TextCyan << "1st quartile: " <<
+                result.IterationTimeQuartile1() / 1000.0 <<
+                " us | 3rd quartile: " <<
+                result.IterationTimeQuartile3() / 1000.0 << " us" <<
+                Console::TextDefault << ")");
 
             _stream << std::setprecision(5);
 
@@ -265,12 +264,13 @@ namespace hayai
                           (result.IterationsPerSecondMinimum()),
                           (result.IterationsPerSecondAverage()),
                           "iterations/s");
-            PAD("Median performance: "
-		<< result.IterationsPerSecondMedian() << " iterations/s "
-		<< "(" << Console::TextCyan << " "
-		<< result.IterationsPerSecondQuartile1() << " | "
-		<< result.IterationsPerSecondQuartile3() << " "
-		<< Console::TextDefault << ")");
+            PAD("Median performance: " <<
+                result.IterationsPerSecondMedian() << " iterations/s (" <<
+                Console::TextCyan << "1st quartile: " <<
+                result.IterationsPerSecondQuartile1() <<
+                " | 3rd quartile: " <<
+                result.IterationsPerSecondQuartile3() <<
+                Console::TextDefault << ")");
 
 #undef PAD_DEVIATION_INVERSE
 #undef PAD_DEVIATION
