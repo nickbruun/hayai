@@ -3,6 +3,7 @@
 #include <vector>
 #include <stdexcept>
 #include <limits>
+#include <cmath>
 
 #include "hayai_clock.hpp"
 
@@ -25,7 +26,9 @@ namespace hayai
                 _iterations(iterations),
                 _timeTotal(0),
                 _timeRunMin(std::numeric_limits<uint64_t>::max()),
-                _timeRunMax(std::numeric_limits<uint64_t>::min())
+                _timeRunMax(std::numeric_limits<uint64_t>::min()),
+                _timeStdDev(0.0),
+                _timeMedian(0.0)
         {
             // Summarize under the assumption of values being accessed more
             // than once.
@@ -43,6 +46,54 @@ namespace hayai
 
                 ++runIt;
             }
+
+	    const double mean = RunTimeAverage();
+	    double accu = 0.0;
+
+	    runIt = _runTimes.begin();
+
+	    while (runIt != _runTimes.end())
+            {
+                const uint64_t run = *runIt;
+		const double diff = double(run) - mean;
+		accu += (diff * diff);
+
+                ++runIt;
+            }
+
+	    _timeStdDev = std::sqrt(accu / (_runTimes.size() - 1));
+
+	    std::vector<uint64_t> sortedRunTimes( _runTimes );
+	    std::sort( sortedRunTimes.begin(), sortedRunTimes.end() );
+
+	    const uint64_t sortedSize = sortedRunTimes.size();
+	    const uint64_t sortedSizeHalf = sortedSize / 2;
+	    if (sortedSize >= 2)
+	    {
+		const uint64_t quartile = sortedSizeHalf / 2;
+		if ((sortedSize % 2) == 0)
+		{
+		    _timeMedian =
+			(double(sortedRunTimes[sortedSizeHalf - 1])
+			 + double(sortedRunTimes[sortedSizeHalf])) / 2;
+
+		    _timeQuartile1 =
+			double(sortedRunTimes[quartile]);
+		    _timeQuartile3 =
+			double(sortedRunTimes[sortedSizeHalf + quartile]);
+		}
+		else
+		{
+		    _timeMedian = double(sortedRunTimes[sortedSizeHalf]);
+
+		    _timeQuartile1 =
+			(double(sortedRunTimes[quartile - 1])
+			 + double(sortedRunTimes[quartile])) / 2;
+		    _timeQuartile3 =
+			(double(sortedRunTimes[sortedSizeHalf + (quartile - 1)])
+			 + double(sortedRunTimes[sortedSizeHalf + quartile])) / 2;
+		}
+	    }
         }
 
 
@@ -66,6 +117,29 @@ namespace hayai
             return double(_timeTotal) / double(_runTimes.size());
         }
 
+        /// Standard deviation time per run.
+        inline double RunTimeStdDev() const
+        {
+	    return _timeStdDev;
+        }
+
+        /// Median (2nd Quartile) time per run.
+        inline double RunTimeMedian() const
+        {
+	    return _timeMedian;
+        }
+
+        /// 1st Quartile time per run.
+        inline double RunTimeQuartile1() const
+        {
+	    return _timeQuartile1;
+        }
+
+        /// 3rd Quartile time per run.
+        inline double RunTimeQuartile3() const
+        {
+	    return _timeQuartile3;
+        }
 
         /// Maximum time per run.
         inline double RunTimeMaximum() const
@@ -87,6 +161,23 @@ namespace hayai
             return 1000000000.0 / RunTimeAverage();
         }
 
+        /// Median (2nd Quartile) runs per second.
+        inline double RunsPerSecondMedian() const
+        {
+            return 1000000000.0 / RunTimeMedian();
+        }
+
+        /// 1st Quartile runs per second.
+        inline double RunsPerSecondQuartile1() const
+        {
+            return 1000000000.0 / RunTimeQuartile1();
+        }
+
+        /// 3rd Quartile runs per second.
+        inline double RunsPerSecondQuartile3() const
+        {
+            return 1000000000.0 / RunTimeQuartile3();
+        }
 
         /// Maximum runs per second.
         inline double RunsPerSecondMaximum() const
@@ -108,6 +199,29 @@ namespace hayai
             return RunTimeAverage() / double(_iterations);
         }
 
+        /// Standard deviation time per iteration.
+        inline double IterationTimeStdDev() const
+        {
+            return RunTimeStdDev() / double(_iterations);
+        }
+
+        /// Median (2nd Quartile) time per iteration.
+        inline double IterationTimeMedian() const
+        {
+            return RunTimeMedian() / double(_iterations);
+        }
+
+        /// 1st Quartile time per iteration.
+        inline double IterationTimeQuartile1() const
+        {
+            return RunTimeQuartile1() / double(_iterations);
+        }
+
+        /// 3rd Quartile time per iteration.
+        inline double IterationTimeQuartile3() const
+        {
+            return RunTimeQuartile3() / double(_iterations);
+        }
 
         /// Minimum time per iteration.
         inline double IterationTimeMinimum() const
@@ -129,6 +243,23 @@ namespace hayai
             return 1000000000.0 / IterationTimeAverage();
         }
 
+        /// Median (2nd Quartile) iterations per second.
+        inline double IterationsPerSecondMedian() const
+        {
+            return 1000000000.0 / IterationTimeMedian();
+        }
+
+        /// 1st Quartile iterations per second.
+        inline double IterationsPerSecondQuartile1() const
+        {
+            return 1000000000.0 / IterationTimeQuartile1();
+        }
+
+        /// 3rd Quartile iterations per second.
+        inline double IterationsPerSecondQuartile3() const
+        {
+            return 1000000000.0 / IterationTimeQuartile3();
+        }
 
         /// Minimum iterations per second.
         inline double IterationsPerSecondMinimum() const
@@ -148,6 +279,10 @@ namespace hayai
         uint64_t _timeTotal;
         uint64_t _timeRunMin;
         uint64_t _timeRunMax;
+        double _timeStdDev;
+        double _timeMedian;
+        double _timeQuartile1;
+        double _timeQuartile3;
     };
 }
 #endif
