@@ -28,7 +28,9 @@ namespace hayai
                 _timeRunMin(std::numeric_limits<uint64_t>::max()),
                 _timeRunMax(std::numeric_limits<uint64_t>::min()),
                 _timeStdDev(0.0),
-                _timeMedian(0.0)
+                _timeMedian(0.0),
+                _timeQuartile1(0.0),
+                _timeQuartile3(0.0)
         {
             // Summarize under the assumption of values being accessed more
             // than once.
