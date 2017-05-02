@@ -61,7 +61,7 @@ namespace hayai
                 ++runIt;
             }
 
-	    _timeStdDev = std::sqrt( accu / (_runTimes.size()-1));
+	    _timeStdDev = std::sqrt(accu / (_runTimes.size() - 1));
 
 	    std::vector<uint64_t> sortedRunTimes( _runTimes );
 	    std::sort( sortedRunTimes.begin(), sortedRunTimes.end() );
@@ -74,24 +74,24 @@ namespace hayai
 		if ((sortedSize % 2) == 0)
 		{
 		    _timeMedian =
-			(double(sortedRunTimes[sortedSizeHalf-1])
-			 + double(sortedRunTimes[sortedSizeHalf]) ) / 2;
+			(double(sortedRunTimes[sortedSizeHalf - 1])
+			 + double(sortedRunTimes[sortedSizeHalf])) / 2;
 
 		    _timeQuartile1 =
 			double(sortedRunTimes[quartile]);
 		    _timeQuartile3 =
-			double(sortedRunTimes[sortedSizeHalf+quartile]);
+			double(sortedRunTimes[sortedSizeHalf + quartile]);
 		}
 		else
 		{
 		    _timeMedian = double(sortedRunTimes[sortedSizeHalf]);
 
 		    _timeQuartile1 =
-			(double(sortedRunTimes[quartile-1])
-			 + double(sortedRunTimes[quartile]) ) / 2;
+			(double(sortedRunTimes[quartile - 1])
+			 + double(sortedRunTimes[quartile])) / 2;
 		    _timeQuartile3 =
-			(double(sortedRunTimes[sortedSizeHalf+(quartile-1)])
-			 + double(sortedRunTimes[sortedSizeHalf+quartile]) ) / 2;
+			(double(sortedRunTimes[sortedSizeHalf + (quartile - 1)])
+			 + double(sortedRunTimes[sortedSizeHalf + quartile])) / 2;
 		}
 	    }
         }

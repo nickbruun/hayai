@@ -208,7 +208,7 @@ namespace hayai
 
             PAD("");
             PAD("Average performance: " <<
-                result.RunsPerSecondAverage() << " runs/s " );
+                result.RunsPerSecondAverage() << " runs/s");
             PAD_DEVIATION("Best performance: ",
                           result.RunsPerSecondMaximum(),
                           result.RunsPerSecondAverage(),
@@ -249,30 +249,28 @@ namespace hayai
 		<< "(" << Console::TextCyan << " "
 		<< result.IterationTimeQuartile1() / 1000.0 << " | "
 		<< result.IterationTimeQuartile3() / 1000.0 << " "
-		<< Console::TextDefault << ")"
-		);
+		<< Console::TextDefault << ")");
 
             _stream << std::setprecision(5);
 
             PAD("");
             PAD("Average performance: " <<
                 result.IterationsPerSecondAverage() <<
-                " iter/s " );
+                " iterations/s");
             PAD_DEVIATION("Best performance: ",
                           (result.IterationsPerSecondMaximum()),
                           (result.IterationsPerSecondAverage()),
-                          "iter/s");
+                          "iterations/s");
             PAD_DEVIATION("Worst performance: ",
                           (result.IterationsPerSecondMinimum()),
                           (result.IterationsPerSecondAverage()),
-                          "iter/s");
+                          "iterations/s");
             PAD("Median performance: "
-		<< result.IterationsPerSecondMedian() << " iter/s "
+		<< result.IterationsPerSecondMedian() << " iterations/s "
 		<< "(" << Console::TextCyan << " "
 		<< result.IterationsPerSecondQuartile1() << " | "
 		<< result.IterationsPerSecondQuartile3() << " "
-		<< Console::TextDefault << ")"
-		);
+		<< Console::TextDefault << ")");
 
 #undef PAD_DEVIATION_INVERSE
 #undef PAD_DEVIATION
