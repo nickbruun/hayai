@@ -153,7 +153,6 @@ namespace hayai
                     _stream << JSON_VALUE_SEPARATOR;
 
                 _stream << JSON_OBJECT_BEGIN
-
                            JSON_STRING_BEGIN "duration" JSON_STRING_END
                            JSON_NAME_SEPARATOR
                         << std::fixed
@@ -165,28 +164,15 @@ namespace hayai
             _stream <<
                 JSON_ARRAY_END;
 
-	    dumpProperty( "mean", result.RunTimeAverage() );
-	    dumpProperty( "stddev", result.RunTimeStdDev() );
-	    dumpProperty( "median", result.RunTimeMedian() );
-	    dumpProperty( "quartile1", result.RunTimeQuartile1() );
-	    dumpProperty( "quartile3", result.RunTimeQuartile3() );
+            WriteDoubleProperty("mean", result.RunTimeAverage());
+            WriteDoubleProperty("std_dev", result.RunTimeStdDev());
+            WriteDoubleProperty("median", result.RunTimeMedian());
+            WriteDoubleProperty("quartile_1", result.RunTimeQuartile1());
+            WriteDoubleProperty("quartile_3", result.RunTimeQuartile3());
 
             EndTestObject();
         }
     private:
-	void dumpProperty( const std::string& key, const double value )
-	{
-	    _stream
-                << JSON_VALUE_SEPARATOR
-		<< JSON_STRING_BEGIN
-		<< key
-		<< JSON_STRING_END
-		<< JSON_NAME_SEPARATOR
-		<< std::fixed
-		<< std::setprecision(6)
-		<< (value / 1000000.0);
-	}
-
         void BeginTestObject(const std::string& fixtureName,
                              const std::string& testName,
                              const TestParametersDescriptor& parameters,
@@ -330,6 +316,23 @@ namespace hayai
             }
 
             _stream << JSON_STRING_END;
+        }
+
+
+        /// Write a property with a double value.
+
+        /// @param key Property key.
+        /// @param value Property value.
+        void WriteDoubleProperty(const std::string& key, const double value)
+        {
+            _stream << JSON_VALUE_SEPARATOR
+                    << JSON_STRING_BEGIN
+                    << key
+                    << JSON_STRING_END
+                    << JSON_NAME_SEPARATOR
+                    << std::fixed
+                    << std::setprecision(6)
+                    << (value / 1000000.0);
         }
 
 
