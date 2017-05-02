@@ -47,53 +47,65 @@ namespace hayai
                 ++runIt;
             }
 
-	    const double mean = RunTimeAverage();
-	    double accu = 0.0;
+            const double mean = RunTimeAverage();
+            double accu = 0.0;
 
-	    runIt = _runTimes.begin();
+            runIt = _runTimes.begin();
 
-	    while (runIt != _runTimes.end())
+            while (runIt != _runTimes.end())
             {
                 const uint64_t run = *runIt;
-		const double diff = double(run) - mean;
-		accu += (diff * diff);
+                const double diff = double(run) - mean;
+                accu += (diff * diff);
 
                 ++runIt;
             }
 
-	    _timeStdDev = std::sqrt(accu / (_runTimes.size() - 1));
+            _timeStdDev = std::sqrt(accu / (_runTimes.size() - 1));
 
-	    std::vector<uint64_t> sortedRunTimes( _runTimes );
-	    std::sort( sortedRunTimes.begin(), sortedRunTimes.end() );
+            std::vector<uint64_t> sortedRunTimes(_runTimes);
+            std::sort(sortedRunTimes.begin(), sortedRunTimes.end());
 
-	    const uint64_t sortedSize = sortedRunTimes.size();
-	    const uint64_t sortedSizeHalf = sortedSize / 2;
-	    if (sortedSize >= 2)
-	    {
-		const uint64_t quartile = sortedSizeHalf / 2;
-		if ((sortedSize % 2) == 0)
-		{
-		    _timeMedian =
-			(double(sortedRunTimes[sortedSizeHalf - 1])
-			 + double(sortedRunTimes[sortedSizeHalf])) / 2;
+            const std::size_t sortedSize = sortedRunTimes.size();
+            const std::size_t sortedSizeHalf = sortedSize / 2;
 
-		    _timeQuartile1 =
-			double(sortedRunTimes[quartile]);
-		    _timeQuartile3 =
-			double(sortedRunTimes[sortedSizeHalf + quartile]);
-		}
-		else
-		{
-		    _timeMedian = double(sortedRunTimes[sortedSizeHalf]);
+            if (sortedSize >= 2)
+            {
+                const std::size_t quartile = sortedSizeHalf / 2;
 
-		    _timeQuartile1 =
-			(double(sortedRunTimes[quartile - 1])
-			 + double(sortedRunTimes[quartile])) / 2;
-		    _timeQuartile3 =
-			(double(sortedRunTimes[sortedSizeHalf + (quartile - 1)])
-			 + double(sortedRunTimes[sortedSizeHalf + quartile])) / 2;
-		}
-	    }
+                if ((sortedSize % 2) == 0)
+                {
+                    _timeMedian =
+                        (double(sortedRunTimes[sortedSizeHalf - 1]) +
+                         double(sortedRunTimes[sortedSizeHalf])) / 2;
+
+                    _timeQuartile1 =
+                        double(sortedRunTimes[quartile]);
+                    _timeQuartile3 =
+                        double(sortedRunTimes[sortedSizeHalf + quartile]);
+                }
+                else
+                {
+                    _timeMedian = double(sortedRunTimes[sortedSizeHalf]);
+
+                    _timeQuartile1 =
+                        (double(sortedRunTimes[quartile - 1]) +
+                         double(sortedRunTimes[quartile])) / 2;
+                    _timeQuartile3 = (
+                        double(
+                            sortedRunTimes[sortedSizeHalf + (quartile - 1)]
+                        ) +
+                        double(
+                            sortedRunTimes[sortedSizeHalf + quartile]
+                        )
+                    ) / 2;
+                }
+            }
+            else if (sortedSize > 0)
+            {
+                _timeQuartile1 = double(sortedRunTimes[0]);
+                _timeQuartile3 = _timeQuartile1;
+            }
         }
 
 
@@ -120,25 +132,25 @@ namespace hayai
         /// Standard deviation time per run.
         inline double RunTimeStdDev() const
         {
-	    return _timeStdDev;
+            return _timeStdDev;
         }
 
         /// Median (2nd Quartile) time per run.
         inline double RunTimeMedian() const
         {
-	    return _timeMedian;
+            return _timeMedian;
         }
 
         /// 1st Quartile time per run.
         inline double RunTimeQuartile1() const
         {
-	    return _timeQuartile1;
+            return _timeQuartile1;
         }
 
         /// 3rd Quartile time per run.
         inline double RunTimeQuartile3() const
         {
-	    return _timeQuartile3;
+            return _timeQuartile3;
         }
 
         /// Maximum time per run.
