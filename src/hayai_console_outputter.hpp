@@ -197,8 +197,8 @@ namespace hayai
                                   (result.RunTimeAverage() / 1000.0),
                                   "us");
             PAD("Median time: " <<
-                result.RunTimeMedian() / 1000.0 << " us (1st quartile: " <<
-                Console::TextCyan <<
+                result.RunTimeMedian() / 1000.0 << " us (" <<
+                Console::TextCyan << "1st quartile: " <<
                 result.RunTimeQuartile1() / 1000.0 << " us | 3rd quartile: " <<
                 result.RunTimeQuartile3() / 1000.0 << " us" <<
                 Console::TextDefault << ")");
