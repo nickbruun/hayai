@@ -1,19 +1,57 @@
 language: cpp
+
 notifications:
   email: false
-compiler:
-  - clang
-  - gcc
+
+env:
+  global:
+    - /usr/local/bin:$PATH
+
+matrix:
+  include:
+    - os: linux
+      compiler: gcc
+      env:
+        - COMPILER=g++
+        - BUILD_TYPE=Debug
+        - EXTRA_FLAGS="-Wall -pedantic"
+    - os: linux
+      compiler: gcc
+      env:
+        - COMPILER=g++
+        - BUILD_TYPE=Release
+        - EXTRA_FLAGS="-Wall -pedantic"
+    - os: linux
+      compiler: clang
+      env:
+        - COMPILER=clang++
+        - BUILD_TYPE=Debug
+        - EXTRA_FLAGS="-Weverything -Wno-weak-vtables -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded"
+    - os: linux
+      compiler: clang
+      env:
+        - COMPILER=clang++
+        - BUILD_TYPE=Release
+        - EXTRA_FLAGS="-Weverything -Wno-weak-vtables -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded"
+
 before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get -y install valgrind
+  - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
+      set -e;
+      sudo apt-get update -qq;
+      sudo apt-get -y install valgrind;
+    fi
+
 before_script:
+  - mkdir build && cd build
   - mkdir install_tmp
+
 script:
-  - ./script/travis-cmake .
-  - make
+  - export CXXFLAGS="${EXTRA_FLAGS}"
+  - cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DTEST=ON ..
+  - make VERBOSE=1
   - DESTDIR=install_tmp make install
-  - valgrind --leak-check=full --error-exitcode=1 ./sample/sample
-  - ./script/travis-cmake -DTEST=true .
-  - make
-  - make test
+  - if [ "${TRAVIS_OS_NAME}" == "linux" -a "${BUILD_TYPE}" == "Debug" ]; then
+      set -e;
+      valgrind --leak-check=full --error-exitcode=1 ./sample/sample;
+    fi
+  - ctest -C ${BUILD_TYPE} -V
