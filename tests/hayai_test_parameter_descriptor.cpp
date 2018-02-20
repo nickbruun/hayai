@@ -52,7 +52,7 @@ void ExpectTestParameterDescriptorParameterDescriptors(
             msg << actual[j];
         }
 
-        ADD_FAILURE() << msg;
+        ADD_FAILURE() << msg.str();
     }
     else if (i < expected.size())
     {
@@ -66,7 +66,7 @@ void ExpectTestParameterDescriptorParameterDescriptors(
             msg << expected[j];
         }
 
-        ADD_FAILURE() << msg;
+        ADD_FAILURE() << msg.str();
     }
 }
 
