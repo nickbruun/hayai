@@ -33,6 +33,30 @@ matrix:
         - COMPILER=clang++
         - BUILD_TYPE=Release
         - EXTRA_FLAGS="-Weverything -Wno-weak-vtables -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded"
+    - os: linux
+      compiler: clang
+      env:
+        - COMPILER=clang++
+        - BUILD_TYPE=Release
+        - EXTRA_FLAGS="-std=c++11 -Weverything -Wno-weak-vtables -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded -Wno-breserved-id-macro -Wno-zero-as-null-pointer-constant"
+    - os: linux
+      compiler: clang
+      env:
+        - COMPILER=clang++
+        - BUILD_TYPE=Release
+        - EXTRA_FLAGS="-std=c++14 -Weverything -Wno-weak-vtables -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded -Wno-reserved-id-macro -Wno-zero-as-null-pointer-constant"
+    - os: linux
+      compiler: clang
+      env:
+        - COMPILER=clang++
+        - BUILD_TYPE=Release
+        - EXTRA_FLAGS="-std=c++17 -Weverything -Wno-weak-vtables -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded -Wno-reserved-id-macro -Wno-zero-as-null-pointer-constant"
+    - os: linux
+      compiler: clang
+      env:
+        - COMPILER=clang++
+        - BUILD_TYPE=Release
+        - EXTRA_FLAGS="-stdlib=libc++ -std=c++17 -Weverything -Wno-weak-vtables -Wno-global-constructors -Wno-exit-time-destructors -Wno-padded -Wno-reserved-id-macro -Wno-zero-as-null-pointer-constant"
 
 before_install:
   - if [ "${TRAVIS_OS_NAME}" == "linux" ]; then
@@ -47,6 +71,7 @@ before_script:
 
 script:
   - export CXXFLAGS="${EXTRA_FLAGS}"
+  - export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/usr/local/clang-5.0.0/lib"
   - cmake -DCMAKE_CXX_COMPILER=${COMPILER} -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_BUILD_TYPE=${BUILD_TYPE} -DTEST=ON ..
   - make VERBOSE=1
   - DESTDIR=install_tmp make install
