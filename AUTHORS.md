@@ -9,3 +9,6 @@ The following people have contributed to Hayai:
 * Mateusz Łoskot <mateusz@loskot.net>
 * Philipp Fischbeck
 * Sławomir Zborowski
+* Philipp Paulweber
+* Antonio Carlos <acnazarejr@gmail.com>
+* Zsolt Parragi <zsolt.parragi@cancellar.hu>
