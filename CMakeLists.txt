@@ -48,12 +48,12 @@ endif (${NEED_RT_LIB})
 # Include the individual projects.
 add_subdirectory(src)
 
-# Include the sample subdirectory if it is asked
+# Include the sample subdirectory if requested by user passing -BUILD_HAYAI_SAMPLES=true.
 if (${BUILD_HAYAI_SAMPLES})
   add_subdirectory(sample)
 endif (${BUILD_HAYAI_SAMPLES})
 
-# Include tests if requested by the user passing -DTEST=true.
+# Include tests if requested by the user passing -DBUILD_HAYAI_TESTS=true.
 if (${BUILD_HAYAI_TESTS})
   enable_testing()
 
@@ -74,16 +74,18 @@ export(
 # (this registers the build-tree with a global CMake-registry.)
 export(PACKAGE hayai)
 
-# Install the targets if it is asked
+# Install targets if requested.
 if (${INSTALL_HAYAI})
   # Create the hayai-config.cmake.
   file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
-     "${INSTALL_INCLUDE_DIR}")
-  # ... for the build tree
+    "${INSTALL_INCLUDE_DIR}")
+
+  # ... for the build tree.
   set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src" "${PROJECT_BINARY_DIR}")
   configure_file(hayai-config.cmake.in
     "${PROJECT_BINARY_DIR}/hayai-config.cmake" @ONLY)
-  # ... for the install tree
+
+  # ... for the install tree.
   set(CONF_INCLUDE_DIRS "\${HAYAI_CMAKE_DIR}/${REL_INCLUDE_DIR}")
   configure_file(
     hayai-config.cmake.in
@@ -105,8 +107,9 @@ if (${INSTALL_HAYAI})
   )
 endif (${INSTALL_HAYAI})
 
-# Print build info
-# This function has been partially taken from the OpenCV CMake utilities
+# Print build resume.
+#
+# This function has been adapted from the OpenCV CMake utilities.
 function(print_status txt var)
   if (var)
     message(STATUS ${txt} "YES")
@@ -115,8 +118,8 @@ function(print_status txt var)
   endif (var)
 endfunction()
 message(STATUS "")
-message(STATUS "Hayai Build resume")
+message(STATUS "Hayai build resume:")
 print_status("  Building tests:     " ${BUILD_HAYAI_TESTS})
 print_status("  Building samples:   " ${BUILD_HAYAI_SAMPLES})
-print_status("  Install Hayai:      " ${INSTALL_HAYAI})
+print_status("  Installing:         " ${INSTALL_HAYAI})
 message(STATUS "")

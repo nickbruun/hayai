@@ -33,9 +33,9 @@ This will also build the sample available in the `sample/` directory of the repo
 
 ## Developing hayai
 
-_hayai_ includes a (currently not at all very comprehensive) test suite for development. To use the test suite, pass a boolean true value as the `TEST` CMake variable:
+_hayai_ includes a (currently not at all very comprehensive) test suite for development. To use the test suite, pass a boolean true value as the `BUILD_HAYAI_TESTS` CMake variable:
 
     $ cd hayai
-    $ cmake -DTEST=true .
+    $ cmake -DBUILD_HAYAI_TESTS=true .
     $ make
     $ make test
