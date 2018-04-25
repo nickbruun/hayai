@@ -4,6 +4,10 @@ project(hayai)
 cmake_minimum_required(VERSION 2.4)
 cmake_policy(SET CMP0012 NEW)
 
+option(INSTALL_HAYAI "Install Hayai in addition of library compilation" ON)
+option(BUILD_HAYAI_TESTS "Build the tests" ON)
+option(BUILD_HAYAI_SAMPLES "Build the samples" ON)
+
 # Offer the user the choice of overriding the installation directories.
 set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
 set(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
@@ -43,15 +47,19 @@ endif (${NEED_RT_LIB})
 ##
 # Include the individual projects.
 add_subdirectory(src)
-add_subdirectory(sample)
+
+# Include the sample subdirectory if it is asked
+if (${BUILD_HAYAI_SAMPLES})
+  add_subdirectory(sample)
+endif (${BUILD_HAYAI_SAMPLES})
 
 # Include tests if requested by the user passing -DTEST=true.
-if (${TEST})
+if (${BUILD_HAYAI_TESTS})
   enable_testing()
 
   add_subdirectory(vendor/gtest)
   add_subdirectory(tests)
-endif (${TEST})
+endif (${BUILD_HAYAI_TESTS})
 
 ##
 # Export targets and package
@@ -66,30 +74,49 @@ export(
 # (this registers the build-tree with a global CMake-registry.)
 export(PACKAGE hayai)
 
-# Create the hayai-config.cmake.
-file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
-   "${INSTALL_INCLUDE_DIR}")
-# ... for the build tree
-set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src" "${PROJECT_BINARY_DIR}")
-configure_file(hayai-config.cmake.in
-  "${PROJECT_BINARY_DIR}/hayai-config.cmake" @ONLY)
-# ... for the install tree
-set(CONF_INCLUDE_DIRS "\${HAYAI_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-configure_file(
-  hayai-config.cmake.in
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hayai-config.cmake" @ONLY
-)
+# Install the targets if it is asked
+if (${INSTALL_HAYAI})
+  # Create the hayai-config.cmake.
+  file(RELATIVE_PATH REL_INCLUDE_DIR "${INSTALL_CMAKE_DIR}"
+     "${INSTALL_INCLUDE_DIR}")
+  # ... for the build tree
+  set(CONF_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/src" "${PROJECT_BINARY_DIR}")
+  configure_file(hayai-config.cmake.in
+    "${PROJECT_BINARY_DIR}/hayai-config.cmake" @ONLY)
+  # ... for the install tree
+  set(CONF_INCLUDE_DIRS "\${HAYAI_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+  configure_file(
+    hayai-config.cmake.in
+    "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hayai-config.cmake" @ONLY
+  )
 
-# Install the hayai-config.cmake
-install(
-  FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hayai-config.cmake"
-  DESTINATION "${INSTALL_CMAKE_DIR}"
-  COMPONENT dev
-)
+  # Install the hayai-config.cmake
+  install(
+    FILES "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hayai-config.cmake"
+    DESTINATION "${INSTALL_CMAKE_DIR}"
+    COMPONENT dev
+  )
 
-# Install the export set for use with the install-tree.
-install(
-  EXPORT hayai-targets
-  DESTINATION "${INSTALL_CMAKE_DIR}"
-  COMPONENT dev
-)
+  # Install the export set for use with the install-tree.
+  install(
+    EXPORT hayai-targets
+    DESTINATION "${INSTALL_CMAKE_DIR}"
+    COMPONENT dev
+  )
+endif (${INSTALL_HAYAI})
+
+# Print build info
+# This function has been partially taken from the OpenCV CMake utilities
+function(print_status txt var)
+  if (var)
+    message(STATUS ${txt} "YES")
+  else (var)
+    message(STATUS ${txt} "NO")
+  endif (var)
+endfunction()
+message(STATUS "")
+message(STATUS "Hayai Build resume")
+print_status("  Building tests:     " ${BUILD_HAYAI_TESTS})
+print_status("  Building samples:   " ${BUILD_HAYAI_SAMPLES})
+print_status("  Install Hayai:      " ${INSTALL_HAYAI})
+message(STATUS "")
