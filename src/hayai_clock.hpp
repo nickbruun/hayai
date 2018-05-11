@@ -39,6 +39,7 @@
 #ifndef __HAYAI_CLOCK
 #define __HAYAI_CLOCK
 
+#include "hayai_config.hpp"
 #include "hayai_compatibility.hpp"
 
 
@@ -55,6 +56,10 @@
 
 // Unix
 #elif defined(__unix__) || defined(__unix) || defined(unix)
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
 
 // gethrtime
 #   if (defined(__hpux) || defined(hpux)) || ((defined(__sun__) || defined(__sun) || defined(sun)) && (defined(__SVR4) || defined(__svr4__)))
