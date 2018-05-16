@@ -1,10 +1,7 @@
-configure_file(hayai_config.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/hayai_config.hpp)
-
 file(GLOB hayai_headers
   hayai.hpp
   hayai_benchmarker.hpp
   hayai_clock.hpp
-  hayai_config.hpp
   hayai_compatibility.hpp
   hayai_console.hpp
   hayai_console_outputter.hpp

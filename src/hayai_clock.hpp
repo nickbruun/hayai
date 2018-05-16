@@ -39,7 +39,6 @@
 #ifndef __HAYAI_CLOCK
 #define __HAYAI_CLOCK
 
-#include "hayai_config.hpp"
 #include "hayai_compatibility.hpp"
 
 
@@ -57,7 +56,7 @@
 // Unix
 #elif defined(__unix__) || defined(__unix) || defined(unix)
 
-#ifdef HAVE_UNISTD_H
+#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
 #include <unistd.h>
 #endif
 

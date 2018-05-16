@@ -20,5 +20,4 @@ tests/tests
 /debian/changelog
 /debian/copyright
 /dist
-/src/hayai_config.hpp
 /.vagrant

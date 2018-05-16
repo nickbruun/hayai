@@ -1,7 +1,0 @@
-#ifndef __HAYAI_CONFIG
-#define __HAYAI_CONFIG
-
-/* Defined if <unistd.h> is supported */
-#cmakedefine HAVE_UNISTD_H
-
-#endif
