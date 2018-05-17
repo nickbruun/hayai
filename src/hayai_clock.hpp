@@ -42,6 +42,11 @@
 #include "hayai_compatibility.hpp"
 
 
+// POSIX
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#include <unistd.h>
+#endif
+
 // Win32
 #if defined(_WIN32)
 #ifndef NOMINMAX
@@ -55,10 +60,6 @@
 
 // Unix
 #elif defined(__unix__) || defined(__unix) || defined(unix)
-
-#if defined (__unix__) || (defined (__APPLE__) && defined (__MACH__))
-#include <unistd.h>
-#endif
 
 // gethrtime
 #   if (defined(__hpux) || defined(hpux)) || ((defined(__sun__) || defined(__sun) || defined(sun)) && (defined(__SVR4) || defined(__svr4__)))
