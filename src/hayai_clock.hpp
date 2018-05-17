@@ -42,6 +42,11 @@
 #include "hayai_compatibility.hpp"
 
 
+// POSIX
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#include <unistd.h>
+#endif
+
 // Win32
 #if defined(_WIN32)
 #ifndef NOMINMAX
