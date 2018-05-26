@@ -20,7 +20,7 @@ namespace hayai
     class Test
     {
     public:
-        /// Set up the testing fixture for execution of a run.
+        /// Set up the testing fixture for execution of a single run.
         virtual void SetUp()
         {
 
@@ -28,8 +28,20 @@ namespace hayai
 
 
         /// Tear down the previously set up testing fixture after the
-        /// execution run.
+        /// execution of a single run.
         virtual void TearDown()
+        {
+
+        }
+
+        /// Executed only once before all runs.
+        virtual void SetUpBefore()
+        {
+
+        }
+
+        /// Executed only once after all runs.
+        virtual void TearDownAfter()
         {
 
         }

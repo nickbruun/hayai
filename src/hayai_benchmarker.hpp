@@ -4,6 +4,7 @@
 #include <vector>
 #include <limits>
 #include <iomanip>
+#include <memory>
 #if __cplusplus > 201100L
 #include <random>
 #endif
@@ -238,24 +239,27 @@ namespace hayai
                 uint64_t overheadCalibration =
                     calibrationModel.GetCalibration(descriptor->Iterations);
 
-                std::size_t run = 0;
-                while (run < descriptor->Runs)
-                {
-                    // Construct a test instance.
-                    Test* test = descriptor->Factory->CreateTest();
+                { // test lifetime scope
+                    std::unique_ptr<Test> test(descriptor->Factory->CreateTest());
 
-                    // Run the test.
-                    uint64_t time = test->Run(descriptor->Iterations);
+                    test->SetUpBefore();
 
-                    // Store the test time.
-                    runTimes[run] = (time > overheadCalibration ?
-                                     time - overheadCalibration :
-                                     0);
+                    std::size_t run = 0;
+                    while (run < descriptor->Runs)
+                    {
 
-                    // Dispose of the test instance.
-                    delete test;
+                        // Run the test.
+                        uint64_t time = test->Run(descriptor->Iterations);
 
-                    ++run;
+                        // Store the test time.
+                        runTimes[run] = (time > overheadCalibration ?
+                                         time - overheadCalibration :
+                                         0);
+
+                        ++run;
+                    }
+
+                    test->TearDownAfter();
                 }
 
                 // Calculate the test result.
