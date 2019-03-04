@@ -21,6 +21,12 @@ add_library(hayai_main
   hayai_posix_main.cpp
 )
 
+target_include_directories(hayai_main
+  PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:${INSTALL_INCLUDE_DIR}/hayai>
+)
+
 set_target_properties(hayai_main PROPERTIES
   PUBLIC_HEADER "${hayai_headers}"
 )
