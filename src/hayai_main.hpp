@@ -132,6 +132,7 @@ namespace hayai
     }
 
 
+    FILE_OUTPUTTER_IMPLEMENTATION(Html);
     FILE_OUTPUTTER_IMPLEMENTATION(Json);
     FILE_OUTPUTTER_IMPLEMENTATION(Console);
     FILE_OUTPUTTER_IMPLEMENTATION(JUnitXml);
@@ -264,6 +265,8 @@ namespace hayai
                         ADD_OUTPUTTER(Console)
                     else if (!strcmp(format, "json"))
                         ADD_OUTPUTTER(Json)
+                    else if (!strcmp(format, "html"))
+                        ADD_OUTPUTTER(Html)
                     else if (!strcmp(format, "junit"))
                         ADD_OUTPUTTER(JUnitXml)
                     else
@@ -486,6 +489,9 @@ namespace hayai
                       << "    " << HAYAI_MAIN_FORMAT_ARGUMENT("json")
                       << std::endl
                       << "      JSON." << std::endl
+                      << "    " << HAYAI_MAIN_FORMAT_ARGUMENT("html")
+                      << std::endl
+                      << "      HTML." << std::endl
                       << "    " << HAYAI_MAIN_FORMAT_ARGUMENT("junit")
                       << std::endl
                       << "      JUnit-compatible XML (very restrictive.)"
